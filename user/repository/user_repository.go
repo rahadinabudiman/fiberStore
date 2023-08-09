@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	InsertOne(req *models.User) (*models.User, error)
 	FindOneById(id int) (*models.User, error)
+	FindOneByUsername(username string) (*models.User, error)
 	FindAll(page, limit int, search string) (*[]models.User, int, error)
 	UpdateOne(req *models.User) (*models.User, error)
 	DeleteOne(id int) error
@@ -29,6 +30,17 @@ func (ur *userRepository) InsertOne(req *models.User) (*models.User, error) {
 	}
 
 	return req, nil
+}
+
+func (ur *userRepository) FindOneByUsername(username string) (*models.User, error) {
+	var user *models.User
+
+	err := ur.db.Model(&user).Where("username = ?", username).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (ur *userRepository) FindOneById(id int) (*models.User, error) {
