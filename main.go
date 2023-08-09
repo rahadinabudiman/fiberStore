@@ -2,9 +2,14 @@ package main
 
 import (
 	"fiberStore/author"
+	"fiberStore/helpers"
+	_userHandler "fiberStore/user/delivery/http"
+	_userRepository "fiberStore/user/repository"
+	_userUsecase "fiberStore/user/usecase"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -20,6 +25,9 @@ func main() {
 	app.Use(cors.New())
 	// Initialize default config for logger middleware
 	app.Use(logger.New())
+	api := app.Group("/api/v1")
+
+	myValidator := helpers.NewXValidator()
 
 	// Load .env file
 	err := godotenv.Load()
@@ -39,13 +47,22 @@ func main() {
 		log.Fatal("Error migrating database")
 	}
 
+	// Setup Context Timeout
+	CONTEXT_TIMEOUT, err := helpers.GetEnvInt("CONTEXT_TIMEOUT")
+	if err != nil {
+		log.Fatal(err)
+	}
+	timeoutContext := time.Duration(CONTEXT_TIMEOUT) * time.Second
+
+	// Setup Routes
+	UserRepository := _userRepository.NewUserRepository(database)
+	UserUsecase := _userUsecase.NewUserUsecase(UserRepository, timeoutContext)
+	_userHandler.NewUserHandler(api.(*fiber.Group), UserUsecase, myValidator.GetValidator())
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 
-	// api := app.Group("/api/v1")
-
 	appPort := fmt.Sprintf(":%s", os.Getenv("SERVER_ADDRESS"))
 	log.Fatal(app.Listen(appPort))
-
 }
