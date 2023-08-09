@@ -55,21 +55,22 @@ func (ur *userRepository) FindOneById(id int) (*models.User, error) {
 }
 
 func (ur *userRepository) FindAll(page, limit int, search string) (*[]models.User, int, error) {
-	var users *[]models.User
+	var users []models.User
 	var count int64
 
-	err := ur.db.Unscoped().Find(&users).Count(&count).Error
+	err := ur.db.Unscoped().Model(&models.User{}).Where("role = 'Customer' AND (name LIKE ? OR username LIKE ?)", "%"+search+"%", "%"+search+"%").Count(&count).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
 	offset := (page - 1) * limit
-	err = ur.db.Unscoped().Where("role = 'user' AND name LIKE ? OR role = 'user' AND username LIKE ?", "%"+search+"%", "%"+search+"%").Order("id DESC").Limit(limit).Offset(offset).Find(&users).Error
+
+	err = ur.db.Unscoped().Where("role = 'Customer' AND (name LIKE ? OR username LIKE ?)", "%"+search+"%", "%"+search+"%").Order("id DESC").Limit(limit).Offset(offset).Find(&users).Error
 	if err != nil {
-		return users, int(count), nil
+		return nil, int(count), err
 	}
 
-	return nil, 0, nil
+	return &users, int(count), nil
 }
 
 func (ur *userRepository) UpdateOne(req *models.User) (*models.User, error) {
