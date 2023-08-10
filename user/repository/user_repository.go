@@ -12,7 +12,7 @@ type UserRepository interface {
 	FindOneByUsername(username string) (*models.User, error)
 	FindAll(page, limit int, search string) (*[]models.User, int, error)
 	UpdateOne(req *models.User) (*models.User, error)
-	DeleteOne(id int) error
+	DeleteOne(user *models.User) error
 }
 
 type userRepository struct {
@@ -82,8 +82,8 @@ func (ur *userRepository) UpdateOne(req *models.User) (*models.User, error) {
 	return req, nil
 }
 
-func (ur *userRepository) DeleteOne(id int) error {
-	err := ur.db.Where("id = ?", id).Delete(&models.User{}).Error
+func (ur *userRepository) DeleteOne(user *models.User) error {
+	err := ur.db.Delete(&user).Error
 	if err != nil {
 		return err
 	}

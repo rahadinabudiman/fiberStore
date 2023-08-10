@@ -5,19 +5,26 @@ import (
 	"errors"
 	"fiberStore/dtos"
 	"fiberStore/helpers"
+	"fiberStore/middlewares"
 	"fiberStore/models"
 	"fiberStore/user/repository"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserUsecase interface {
+	// Authentikasi User
+	LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.UserLoginRequest) (res *dtos.UserLoginResponse, err error)
+	// CRUD User
 	InsertOne(ctx context.Context, req *dtos.UserRegister) (res *dtos.UserRegisterResponse, err error)
 	FindOneById(ctx context.Context, id int) (res *dtos.UserProfileResponse, err error)
 	FindAll(ctx context.Context, page, limit int, search, sortBy string) (*[]dtos.UserDetailResponse, int, error)
-	UpdateOne(req *models.User) (*models.User, error)
-	DeleteOne(id int) error
+	UpdateOne(ctx context.Context, id int, req *dtos.UserUpdateProfile) (res *dtos.UserProfileResponse, err error)
+	DeleteOne(ctx context.Context, id uint, req dtos.DeleteUserRequest) error
 }
 
 type userUsecase struct {
@@ -32,6 +39,34 @@ func NewUserUsecase(UserRepository repository.UserRepository, contextTimeout tim
 	}
 }
 
+func (uu *userUsecase) LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.UserLoginRequest) (res *dtos.UserLoginResponse, err error) {
+	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
+	defer cancel()
+
+	user, err := uu.UserRepository.FindOneByUsername(req.Username)
+	if err != nil {
+		return nil, errors.New("username not found")
+	}
+
+	err = helpers.ComparePassword(req.Password, user.Password)
+	if err != nil {
+		return nil, errors.New("username or password is wrong")
+	}
+
+	token, err := middlewares.CreateToken(user.ID, user.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	middlewares.CreateCookieToken(c, token)
+
+	res = &dtos.UserLoginResponse{
+		Username: req.Username,
+		Token:    token,
+	}
+	return res, nil
+}
+
 func (uu *userUsecase) InsertOne(ctx context.Context, req *dtos.UserRegister) (res *dtos.UserRegisterResponse, err error) {
 	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
 	defer cancel()
@@ -39,6 +74,14 @@ func (uu *userUsecase) InsertOne(ctx context.Context, req *dtos.UserRegister) (r
 	_, err = uu.UserRepository.FindOneByUsername(req.Username)
 	if err == nil {
 		return nil, errors.New("username already exists")
+	}
+
+	if strings.TrimSpace(req.Password) == "" || strings.TrimSpace(req.ConfirmPassword) == "" {
+		return nil, errors.New("password and confirm password cannot be empty")
+	}
+
+	if len(req.Password) < 6 {
+		return nil, errors.New("password must be at least 6 characters")
 	}
 
 	if req.Password != req.ConfirmPassword {
@@ -123,10 +166,60 @@ func (uu *userUsecase) FindAll(ctx context.Context, page, limit int, search, sor
 	return res, count, nil
 }
 
-func (uu *userUsecase) UpdateOne(req *models.User) (*models.User, error) {
-	return uu.UserRepository.UpdateOne(req)
+func (uu *userUsecase) UpdateOne(ctx context.Context, id int, req *dtos.UserUpdateProfile) (res *dtos.UserProfileResponse, err error) {
+	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
+	defer cancel()
+
+	user, err := uu.UserRepository.FindOneById(id)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	if req.Name != "" {
+		user.Name = req.Name
+	}
+	if req.Username != "" {
+		user.Username = req.Username
+	}
+
+	user.Name = req.Name
+	user.Username = req.Username
+
+	user, err = uu.UserRepository.UpdateOne(user)
+	if err != nil {
+		return nil, errors.New("error updating user")
+	}
+
+	res = &dtos.UserProfileResponse{
+		Name:     user.Name,
+		Username: user.Username,
+	}
+
+	return res, nil
 }
 
-func (uu *userUsecase) DeleteOne(id int) error {
-	return uu.UserRepository.DeleteOne(id)
+func (uu *userUsecase) DeleteOne(ctx context.Context, id uint, req dtos.DeleteUserRequest) error {
+	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
+	defer cancel()
+
+	user, err := uu.UserRepository.FindOneById(int(id))
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	if req.Password == "" {
+		return errors.New("password is required")
+	}
+
+	err = helpers.ComparePassword(req.Password, user.Password)
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		return errors.New("password is incorrect")
+	}
+
+	err = uu.UserRepository.DeleteOne(user)
+	if err != nil {
+		return errors.New("error deleting user")
+	}
+
+	return nil
 }
