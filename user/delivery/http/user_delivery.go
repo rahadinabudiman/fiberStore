@@ -13,6 +13,8 @@ type UserHandler interface {
 	Register(c *fiber.Ctx) error
 	GetProfile(c *fiber.Ctx) error
 	GetAllProfile(c *fiber.Ctx) error
+	UpdateProfile(c *fiber.Ctx) error
+	DeleteAccount(c *fiber.Ctx) error
 }
 
 type userHandler struct {
@@ -33,6 +35,8 @@ func NewUserHandler(router *fiber.Group, UserUsecase usecase.UserUsecase, valida
 	api.Post("/register", handler.Register)
 	api.Get("/:id", handler.GetProfile)
 	api.Get("", handler.GetAllProfile)
+	api.Put("/:id", handler.UpdateProfile)
+	api.Delete("/:id", handler.DeleteAccount)
 
 	return handler
 }
@@ -66,9 +70,9 @@ func (user *userHandler) Register(c *fiber.Ctx) error {
 	ctx := c.Context()
 	result, err := user.UserUsecase.InsertOne(ctx, &req)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(
+		return c.Status(fiber.StatusBadRequest).JSON(
 			dtos.NewErrorResponse(
-				fiber.StatusInternalServerError,
+				fiber.StatusBadRequest,
 				"error registering user",
 				dtos.GetErrorData(err),
 			),
@@ -156,6 +160,117 @@ func (user *userHandler) GetAllProfile(c *fiber.Ctx) error {
 			pageParam,
 			limitParam,
 			count,
+		),
+	)
+}
+
+func (user *userHandler) UpdateProfile(c *fiber.Ctx) error {
+	var req dtos.UserUpdateProfile
+
+	userID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"cannot convert UserID",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	if err = c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error parsing request body",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	if err = user.validator.Struct(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error validating request body",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	ctx := c.Context()
+
+	result, err := user.UserUsecase.UpdateOne(ctx, userID, &req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error updating user profile",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(
+		dtos.NewResponse(
+			fiber.StatusOK,
+			"success updating user profile",
+			result,
+		),
+	)
+}
+
+func (user *userHandler) DeleteAccount(c *fiber.Ctx) error {
+	var req dtos.DeleteUserRequest
+
+	userID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"cannot convert UserID",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	if err = c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error parsing request body",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	if err = user.validator.Struct(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error validating request body",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	ctx := c.Context()
+
+	err = user.UserUsecase.DeleteOne(ctx, uint(userID), req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error deleting user profile",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(
+		dtos.NewResponseMessage(
+			fiber.StatusOK,
+			"success deleting user profile",
 		),
 	)
 }
