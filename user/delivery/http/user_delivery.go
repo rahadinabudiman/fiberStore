@@ -10,6 +10,9 @@ import (
 )
 
 type UserHandler interface {
+	// Authentikasi User
+	LoginUser(c *fiber.Ctx) error
+	// CRUD User
 	Register(c *fiber.Ctx) error
 	GetProfile(c *fiber.Ctx) error
 	GetAllProfile(c *fiber.Ctx) error
@@ -28,17 +31,68 @@ func NewUserHandler(router *fiber.Group, UserUsecase usecase.UserUsecase, valida
 		validator:   validator,
 	}
 
+	// Authentikasi
+	router.Post("/login", handler.LoginUser)
+	router.Post("/register", handler.Register)
+
 	// Main Routes
 	api := router.Group("/user")
 
 	// Routes
-	api.Post("/register", handler.Register)
 	api.Get("/:id", handler.GetProfile)
 	api.Get("", handler.GetAllProfile)
 	api.Put("/:id", handler.UpdateProfile)
 	api.Delete("/:id", handler.DeleteAccount)
 
 	return handler
+}
+
+func (user *userHandler) LoginUser(c *fiber.Ctx) error {
+	var (
+		req dtos.UserLoginRequest
+		err error
+	)
+
+	if err = c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error parsing request body",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	if err = user.validator.Struct(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error validating request body",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	ctx := c.Context()
+
+	result, err := user.UserUsecase.LoginUser(ctx, c, &req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error logging in user",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(
+		dtos.NewResponse(
+			fiber.StatusOK,
+			"success logging in user",
+			result,
+		),
+	)
 }
 
 func (user *userHandler) Register(c *fiber.Ctx) error {

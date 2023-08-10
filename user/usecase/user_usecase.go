@@ -5,16 +5,21 @@ import (
 	"errors"
 	"fiberStore/dtos"
 	"fiberStore/helpers"
+	"fiberStore/middlewares"
 	"fiberStore/models"
 	"fiberStore/user/repository"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserUsecase interface {
+	// Authentikasi User
+	LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.UserLoginRequest) (res *dtos.UserLoginResponse, err error)
+	// CRUD User
 	InsertOne(ctx context.Context, req *dtos.UserRegister) (res *dtos.UserRegisterResponse, err error)
 	FindOneById(ctx context.Context, id int) (res *dtos.UserProfileResponse, err error)
 	FindAll(ctx context.Context, page, limit int, search, sortBy string) (*[]dtos.UserDetailResponse, int, error)
@@ -32,6 +37,34 @@ func NewUserUsecase(UserRepository repository.UserRepository, contextTimeout tim
 		UserRepository: UserRepository,
 		contextTimeout: contextTimeout,
 	}
+}
+
+func (uu *userUsecase) LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.UserLoginRequest) (res *dtos.UserLoginResponse, err error) {
+	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
+	defer cancel()
+
+	user, err := uu.UserRepository.FindOneByUsername(req.Username)
+	if err != nil {
+		return nil, errors.New("username not found")
+	}
+
+	err = helpers.ComparePassword(req.Password, user.Password)
+	if err != nil {
+		return nil, errors.New("username or password is wrong")
+	}
+
+	token, err := middlewares.CreateToken(user.ID, user.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	middlewares.CreateCookieToken(c, token)
+
+	res = &dtos.UserLoginResponse{
+		Username: req.Username,
+		Token:    token,
+	}
+	return res, nil
 }
 
 func (uu *userUsecase) InsertOne(ctx context.Context, req *dtos.UserRegister) (res *dtos.UserRegisterResponse, err error) {

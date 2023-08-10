@@ -19,6 +19,16 @@ type DeleteUserRequest struct {
 	Password string `json:"password" form:"password" validate:"gte=6" example:"rahadinabudimansundara"`
 }
 
+type UserLoginRequest struct {
+	Username string `json:"username" form:"username" binding:"required"`
+	Password string `json:"password" form:"password" binding:"required"`
+}
+
+type UserLoginResponse struct {
+	Username string `json:"username" form:"username" binding:"required"`
+	Token    string `json:"token" form:"token" binding:"required"`
+}
+
 type UserRegisterResponse struct {
 	Name      string    `json:"name"`
 	Username  string    `json:"username"`
