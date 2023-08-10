@@ -3,6 +3,7 @@ package main
 import (
 	"fiberStore/author"
 	"fiberStore/helpers"
+	"fiberStore/middlewares"
 	_userHandler "fiberStore/user/delivery/http"
 	_userRepository "fiberStore/user/repository"
 	_userUsecase "fiberStore/user/usecase"
@@ -31,8 +32,14 @@ func main() {
 	}))
 
 	api := app.Group("/api/v1")
+	customer := api.Group("/user")
+	admin := api.Group("/admin")
 
 	myValidator := helpers.NewXValidator()
+
+	// Setup Security Routes
+	customer.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("Customer"))
+	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("Admin"))
 
 	// Load .env file
 	err := godotenv.Load()
@@ -62,7 +69,7 @@ func main() {
 	// Setup Routes
 	UserRepository := _userRepository.NewUserRepository(database)
 	UserUsecase := _userUsecase.NewUserUsecase(UserRepository, timeoutContext)
-	_userHandler.NewUserHandler(api.(*fiber.Group), UserUsecase, myValidator.GetValidator())
+	_userHandler.NewUserHandler(api.(*fiber.Group), customer.(*fiber.Group), admin.(*fiber.Group), UserUsecase, myValidator.GetValidator())
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")

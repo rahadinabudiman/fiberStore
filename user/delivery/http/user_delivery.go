@@ -2,6 +2,7 @@ package http
 
 import (
 	"fiberStore/dtos"
+	"fiberStore/middlewares"
 	"fiberStore/user/usecase"
 	"strconv"
 
@@ -25,24 +26,22 @@ type userHandler struct {
 	validator   *validator.Validate
 }
 
-func NewUserHandler(router *fiber.Group, UserUsecase usecase.UserUsecase, validator *validator.Validate) UserHandler {
+func NewUserHandler(api *fiber.Group, user *fiber.Group, admin *fiber.Group, UserUsecase usecase.UserUsecase, validator *validator.Validate) UserHandler {
 	handler := &userHandler{
 		UserUsecase: UserUsecase,
 		validator:   validator,
 	}
-
 	// Authentikasi
-	router.Post("/login", handler.LoginUser)
-	router.Post("/register", handler.Register)
+	api.Post("/login", handler.LoginUser)
+	api.Post("/register", handler.Register)
 
-	// Main Routes
-	api := router.Group("/user")
+	// Protected User Routes
+	user.Get("", handler.GetProfile)
+	user.Put("/:id", handler.UpdateProfile)
+	user.Delete("/:id", handler.DeleteAccount)
 
-	// Routes
-	api.Get("/:id", handler.GetProfile)
-	api.Get("", handler.GetAllProfile)
-	api.Put("/:id", handler.UpdateProfile)
-	api.Delete("/:id", handler.DeleteAccount)
+	// Protected Admin Routes
+	admin.Get("/user", handler.GetAllProfile)
 
 	return handler
 }
@@ -143,20 +142,29 @@ func (user *userHandler) Register(c *fiber.Ctx) error {
 }
 
 func (user *userHandler) GetProfile(c *fiber.Ctx) error {
-	UserID, err := strconv.Atoi(c.Params("id"))
+	token := middlewares.GetTokenFromHeader(c)
+	if token == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewResponseMessage(
+				fiber.StatusBadRequest,
+				"error getting token from header",
+			),
+		)
+	}
+
+	UserID, err := middlewares.GetUserIdFromToken(token)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
-			dtos.NewErrorResponse(
+			dtos.NewResponseMessage(
 				fiber.StatusBadRequest,
-				"cannot convert UserID",
-				dtos.GetErrorData(err),
+				"error getting user id from token",
 			),
 		)
 	}
 
 	ctx := c.Context()
 
-	result, err := user.UserUsecase.FindOneById(ctx, UserID)
+	result, err := user.UserUsecase.FindOneById(ctx, int(UserID))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			dtos.NewErrorResponse(
@@ -177,6 +185,16 @@ func (user *userHandler) GetProfile(c *fiber.Ctx) error {
 }
 
 func (user *userHandler) GetAllProfile(c *fiber.Ctx) error {
+	token := middlewares.GetTokenFromHeader(c)
+	if token == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewResponseMessage(
+				fiber.StatusBadRequest,
+				"error getting token from header",
+			),
+		)
+	}
+
 	ctx := c.Context()
 
 	pageParam := c.QueryInt("page")
