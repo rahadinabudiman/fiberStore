@@ -33,10 +33,11 @@ type userUsecase struct {
 	contextTimeout       time.Duration
 }
 
-func NewUserUsecase(UserRepository repository.UserRepository, contextTimeout time.Duration) UserUsecase {
+func NewUserUsecase(UserRepository repository.UserRepository, UserAmountRepository repository.UserAmountRepository, contextTimeout time.Duration) UserUsecase {
 	return &userUsecase{
-		UserRepository: UserRepository,
-		contextTimeout: contextTimeout,
+		UserRepository:       UserRepository,
+		UserAmountRepository: UserAmountRepository,
+		contextTimeout:       contextTimeout,
 	}
 }
 
@@ -69,8 +70,6 @@ func (uu *userUsecase) LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.Us
 }
 
 func (uu *userUsecase) InsertOne(ctx context.Context, req *dtos.UserRegister) (res *dtos.UserRegisterResponse, err error) {
-	var userAmount *models.UserAmount
-
 	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
 	defer cancel()
 
@@ -107,21 +106,21 @@ func (uu *userUsecase) InsertOne(ctx context.Context, req *dtos.UserRegister) (r
 		return nil, errors.New("error creating user")
 	}
 
-	userAmount = &models.UserAmount{
-		UserID: resp.ID,
-		Amount: 0,
-	}
-
-	_, err = uu.UserAmountRepository.InsertOne(userAmount)
-	if err != nil {
-		return nil, errors.New("error creating account saldo")
-	}
-
 	res = &dtos.UserRegisterResponse{
 		Name:      resp.Name,
 		Username:  resp.Username,
 		CreatedAt: resp.CreatedAt,
 		UpdatedAt: resp.UpdatedAt,
+	}
+
+	userAmount := &models.UserAmount{
+		UserID: resp.ID,
+		Amount: 0.0,
+	}
+
+	_, err = uu.UserAmountRepository.InsertOne(userAmount)
+	if err != nil {
+		return nil, errors.New("error creating user amount")
 	}
 
 	return res, nil
@@ -232,6 +231,16 @@ func (uu *userUsecase) DeleteOne(ctx context.Context, id uint, req dtos.DeleteUs
 	err = uu.UserRepository.DeleteOne(user)
 	if err != nil {
 		return errors.New("error deleting user")
+	}
+
+	amount, err := uu.UserAmountRepository.FindOne(user.ID)
+	if err != nil {
+		return errors.New("error getting account balance")
+	}
+
+	err = uu.UserAmountRepository.DeleteOne(amount)
+	if err != nil {
+		return errors.New("error deleting account balance")
 	}
 
 	return nil
