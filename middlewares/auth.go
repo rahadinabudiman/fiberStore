@@ -72,6 +72,30 @@ func GetUserIdFromToken(tokenString string) (uint, error) {
 	return userID, nil
 }
 
+func GetRoleFromToken(tokenString string) (string, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("SECRET_JWT")), nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	if !token.Valid {
+		return "", errors.New("invalid token")
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", errors.New("invalid claims")
+	}
+
+	getRole, ok := claims["role"].(string)
+	if !ok {
+		return "", errors.New("role claim not found")
+	}
+
+	return getRole, nil
+}
+
 func RoleMiddleware(role string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user := c.Locals("user").(*jwt.Token)

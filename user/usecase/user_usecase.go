@@ -28,8 +28,9 @@ type UserUsecase interface {
 }
 
 type userUsecase struct {
-	UserRepository repository.UserRepository
-	contextTimeout time.Duration
+	UserRepository       repository.UserRepository
+	UserAmountRepository repository.UserAmountRepository
+	contextTimeout       time.Duration
 }
 
 func NewUserUsecase(UserRepository repository.UserRepository, contextTimeout time.Duration) UserUsecase {
@@ -68,6 +69,8 @@ func (uu *userUsecase) LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.Us
 }
 
 func (uu *userUsecase) InsertOne(ctx context.Context, req *dtos.UserRegister) (res *dtos.UserRegisterResponse, err error) {
+	var userAmount *models.UserAmount
+
 	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
 	defer cancel()
 
@@ -102,6 +105,16 @@ func (uu *userUsecase) InsertOne(ctx context.Context, req *dtos.UserRegister) (r
 	resp, err := uu.UserRepository.InsertOne(CreateUser)
 	if err != nil {
 		return nil, errors.New("error creating user")
+	}
+
+	userAmount = &models.UserAmount{
+		UserID: resp.ID,
+		Amount: 0,
+	}
+
+	_, err = uu.UserAmountRepository.InsertOne(userAmount)
+	if err != nil {
+		return nil, errors.New("error creating account saldo")
 	}
 
 	res = &dtos.UserRegisterResponse{

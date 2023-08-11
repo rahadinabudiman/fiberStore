@@ -4,7 +4,6 @@ import (
 	"fiberStore/dtos"
 	"fiberStore/middlewares"
 	"fiberStore/user/usecase"
-	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -37,7 +36,7 @@ func NewUserHandler(api *fiber.Group, user *fiber.Group, admin *fiber.Group, Use
 
 	// Protected User Routes
 	user.Get("", handler.GetProfile)
-	user.Put("/:id", handler.UpdateProfile)
+	user.Put("", handler.UpdateProfile)
 	user.Delete("/:id", handler.DeleteAccount)
 
 	// Protected Admin Routes
@@ -195,6 +194,26 @@ func (user *userHandler) GetAllProfile(c *fiber.Ctx) error {
 		)
 	}
 
+	role, err := middlewares.GetRoleFromToken(token)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error getting role from token",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	if role != "Admin" {
+		return c.Status(fiber.StatusUnauthorized).JSON(
+			dtos.NewResponseMessage(
+				fiber.StatusUnauthorized,
+				"error unauthorized",
+			),
+		)
+	}
+
 	ctx := c.Context()
 
 	pageParam := c.QueryInt("page")
@@ -237,18 +256,28 @@ func (user *userHandler) GetAllProfile(c *fiber.Ctx) error {
 }
 
 func (user *userHandler) UpdateProfile(c *fiber.Ctx) error {
-	var req dtos.UserUpdateProfile
+	token := middlewares.GetTokenFromHeader(c)
+	if token == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewResponseMessage(
+				fiber.StatusBadRequest,
+				"error getting token from header",
+			),
+		)
+	}
 
-	userID, err := strconv.Atoi(c.Params("id"))
+	userID, err := middlewares.GetUserIdFromToken(token)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			dtos.NewErrorResponse(
 				fiber.StatusBadRequest,
-				"cannot convert UserID",
+				"error getting user id from token",
 				dtos.GetErrorData(err),
 			),
 		)
 	}
+
+	var req dtos.UserUpdateProfile
 
 	if err = c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
@@ -272,7 +301,7 @@ func (user *userHandler) UpdateProfile(c *fiber.Ctx) error {
 
 	ctx := c.Context()
 
-	result, err := user.UserUsecase.UpdateOne(ctx, userID, &req)
+	result, err := user.UserUsecase.UpdateOne(ctx, int(userID), &req)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			dtos.NewErrorResponse(
@@ -293,18 +322,28 @@ func (user *userHandler) UpdateProfile(c *fiber.Ctx) error {
 }
 
 func (user *userHandler) DeleteAccount(c *fiber.Ctx) error {
-	var req dtos.DeleteUserRequest
+	token := middlewares.GetTokenFromHeader(c)
+	if token == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewResponseMessage(
+				fiber.StatusBadRequest,
+				"error getting token from header",
+			),
+		)
+	}
 
-	userID, err := strconv.Atoi(c.Params("id"))
+	userID, err := middlewares.GetUserIdFromToken(token)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			dtos.NewErrorResponse(
 				fiber.StatusBadRequest,
-				"cannot convert UserID",
+				"error getting user id from token",
 				dtos.GetErrorData(err),
 			),
 		)
 	}
+
+	var req dtos.DeleteUserRequest
 
 	if err = c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
