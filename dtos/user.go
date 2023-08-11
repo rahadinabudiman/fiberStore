@@ -24,6 +24,16 @@ type UserLoginRequest struct {
 	Password string `json:"password" form:"password" binding:"required"`
 }
 
+type TopUpSaldoRequest struct {
+	Username string  `json:"username" form:"username"`
+	Amount   float64 `json:"amount" form:"amount" validate:"required" example:"100000"`
+}
+
+type TopUpSaldoResponse struct {
+	Name   string  `json:"name" form:"name"`
+	Amount float64 `json:"amount" form:"amount"`
+}
+
 type UserLoginResponse struct {
 	Username string `json:"username" form:"username" binding:"required"`
 	Token    string `json:"token" form:"token" binding:"required"`
