@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fiberStore/dtos"
-	"fiberStore/models"
 	"fiberStore/user/repository"
 	"time"
 )
@@ -28,20 +27,15 @@ func NewUserAmountUsecase(UserAmountRepository repository.UserAmountRepository, 
 }
 
 func (uau *userAmountUsecase) TopUpSaldo(ctx context.Context, req *dtos.TopUpSaldoRequest) (res *dtos.TopUpSaldoResponse, err error) {
-	var (
-		userAmount *models.UserAmount
-		user       *models.User
-	)
-
 	_, cancel := context.WithTimeout(ctx, uau.contextTimeout)
 	defer cancel()
 
-	user, err = uau.UserRepository.FindOneByUsername(req.Username)
+	user, err := uau.UserRepository.FindOneByUsername(req.Username)
 	if err != nil {
 		return nil, errors.New("username not found")
 	}
 
-	userAmount, err = uau.UserAmountRepository.FindOne(user.ID)
+	userAmount, err := uau.UserAmountRepository.FindOne(user.ID)
 	if err != nil {
 		return nil, errors.New("user not found")
 	}

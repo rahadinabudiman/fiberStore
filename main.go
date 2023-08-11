@@ -69,10 +69,9 @@ func main() {
 	// Setup Routes
 	UserAmountRepository := _userRepository.NewUserAmountRepository(database)
 	UserRepository := _userRepository.NewUserRepository(database)
-
-	// UserAmountUsecase := _userUsecase.NewUserAmountUsecase(UserAmountRepository, UserRepository, timeoutContext)
-
+	UserAmountUsecase := _userUsecase.NewUserAmountUsecase(UserAmountRepository, UserRepository, timeoutContext)
 	UserUsecase := _userUsecase.NewUserUsecase(UserRepository, UserAmountRepository, timeoutContext)
+	_userHandler.NewUserAmountHandler(admin.(*fiber.Group), UserAmountUsecase, UserUsecase, myValidator.GetValidator())
 	_userHandler.NewUserHandler(api.(*fiber.Group), customer.(*fiber.Group), admin.(*fiber.Group), UserUsecase, myValidator.GetValidator())
 
 	app.Get("/", func(c *fiber.Ctx) error {

@@ -233,5 +233,15 @@ func (uu *userUsecase) DeleteOne(ctx context.Context, id uint, req dtos.DeleteUs
 		return errors.New("error deleting user")
 	}
 
+	amount, err := uu.UserAmountRepository.FindOne(user.ID)
+	if err != nil {
+		return errors.New("error getting account balance")
+	}
+
+	err = uu.UserAmountRepository.DeleteOne(amount)
+	if err != nil {
+		return errors.New("error deleting account balance")
+	}
+
 	return nil
 }
