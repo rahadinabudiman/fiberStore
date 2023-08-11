@@ -7,7 +7,6 @@ import (
 	"fiberStore/helpers"
 	"fiberStore/middlewares"
 	"fiberStore/models"
-	"fiberStore/user/repository"
 	"sort"
 	"strings"
 	"time"
@@ -16,24 +15,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserUsecase interface {
-	// Authentikasi User
-	LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.UserLoginRequest) (res *dtos.UserLoginResponse, err error)
-	// CRUD User
-	InsertOne(ctx context.Context, req *dtos.UserRegister) (res *dtos.UserRegisterResponse, err error)
-	FindOneById(ctx context.Context, id int) (res *dtos.UserProfileResponse, err error)
-	FindAll(ctx context.Context, page, limit int, search, sortBy string) (*[]dtos.UserDetailResponse, int, error)
-	UpdateOne(ctx context.Context, id int, req *dtos.UserUpdateProfile) (res *dtos.UserProfileResponse, err error)
-	DeleteOne(ctx context.Context, id uint, req dtos.DeleteUserRequest) error
-}
-
 type userUsecase struct {
-	UserRepository       repository.UserRepository
-	UserAmountRepository repository.UserAmountRepository
+	UserRepository       models.UserRepository
+	UserAmountRepository models.UserAmountRepository
 	contextTimeout       time.Duration
 }
 
-func NewUserUsecase(UserRepository repository.UserRepository, UserAmountRepository repository.UserAmountRepository, contextTimeout time.Duration) UserUsecase {
+func NewUserUsecase(UserRepository models.UserRepository, UserAmountRepository models.UserAmountRepository, contextTimeout time.Duration) models.UserUsecase {
 	return &userUsecase{
 		UserRepository:       UserRepository,
 		UserAmountRepository: UserAmountRepository,
