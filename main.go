@@ -67,12 +67,12 @@ func main() {
 	timeoutContext := time.Duration(CONTEXT_TIMEOUT) * time.Second
 
 	// Setup Routes
-	// UserAmountRepository := _userRepository.NewUserAmountRepository(database)
+	UserAmountRepository := _userRepository.NewUserAmountRepository(database)
 	UserRepository := _userRepository.NewUserRepository(database)
 
 	// UserAmountUsecase := _userUsecase.NewUserAmountUsecase(UserAmountRepository, UserRepository, timeoutContext)
 
-	UserUsecase := _userUsecase.NewUserUsecase(UserRepository, timeoutContext)
+	UserUsecase := _userUsecase.NewUserUsecase(UserRepository, UserAmountRepository, timeoutContext)
 	_userHandler.NewUserHandler(api.(*fiber.Group), customer.(*fiber.Group), admin.(*fiber.Group), UserUsecase, myValidator.GetValidator())
 
 	app.Get("/", func(c *fiber.Ctx) error {
