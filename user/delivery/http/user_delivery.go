@@ -37,10 +37,11 @@ func NewUserHandler(api *fiber.Group, user *fiber.Group, admin *fiber.Group, Use
 	// Protected User Routes
 	user.Get("", handler.GetProfile)
 	user.Put("", handler.UpdateProfile)
-	user.Delete("/:id", handler.DeleteAccount)
+	user.Delete("", handler.DeleteAccount)
 
 	// Protected Admin Routes
 	admin.Get("/user", handler.GetAllProfile)
+	admin.Delete("/user", handler.DeleteAccount)
 
 	return handler
 }

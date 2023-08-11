@@ -10,6 +10,7 @@ type UserAmountRepository interface {
 	InsertOne(req *models.UserAmount) (*models.UserAmount, error)
 	FindOne(id uint) (res *models.UserAmount, err error)
 	UpdateOne(req *models.UserAmount, id uint) (res *models.UserAmount, err error)
+	DeleteOne(req *models.UserAmount) error
 }
 
 type userAmountRepository struct {
@@ -37,7 +38,7 @@ func (uar *userAmountRepository) FindOne(id uint) (res *models.UserAmount, err e
 		return nil, err
 	}
 
-	return res, nil
+	return userAmount, nil
 }
 
 func (uar *userAmountRepository) UpdateOne(req *models.UserAmount, id uint) (res *models.UserAmount, err error) {
@@ -49,4 +50,13 @@ func (uar *userAmountRepository) UpdateOne(req *models.UserAmount, id uint) (res
 	}
 
 	return res, nil
+}
+
+func (uar *userAmountRepository) DeleteOne(req *models.UserAmount) error {
+	err := uar.db.Delete(req).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
