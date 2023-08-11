@@ -102,7 +102,7 @@ func RoleMiddleware(role string) fiber.Handler {
 		claims := user.Claims.(jwt.MapClaims)
 		userRole := claims["role"].(string)
 		// Check if the user's role matches the required role
-		if userRole != role {
+		if userRole != "Admin" && userRole != role {
 			// Return an error response indicating unauthorized access
 			errorResponse := helpers.ErrorResponses{
 				StatusCode: fiber.StatusForbidden,

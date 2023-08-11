@@ -3,7 +3,7 @@ package http
 import (
 	"fiberStore/dtos"
 	"fiberStore/middlewares"
-	"fiberStore/user/usecase"
+	"fiberStore/models"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -21,11 +21,11 @@ type UserHandler interface {
 }
 
 type userHandler struct {
-	UserUsecase usecase.UserUsecase
+	UserUsecase models.UserUsecase
 	validator   *validator.Validate
 }
 
-func NewUserHandler(api *fiber.Group, user *fiber.Group, admin *fiber.Group, UserUsecase usecase.UserUsecase, validator *validator.Validate) UserHandler {
+func NewUserHandler(api *fiber.Group, user *fiber.Group, admin *fiber.Group, UserUsecase models.UserUsecase, validator *validator.Validate) UserHandler {
 	handler := &userHandler{
 		UserUsecase: UserUsecase,
 		validator:   validator,
