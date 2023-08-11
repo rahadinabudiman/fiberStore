@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+  service-fiberStore:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: fiberstore
+    container_name: fiberstore
+    ports:
+      - "8080:8080"
+    networks:
+      - fiberstore-network
+    depends_on:
+      - service-mariadb
+    restart: always
+
+  service-mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=fiberStore
+    ports:
+      - "3306"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+      - ./author/init.sql:/data/application/init.sql
+    command: --init-file /data/application/init.sql
+    networks:
+      - fiberstore-network
+    restart: always
+
+networks:
+  fiberstore-network:
+    driver: bridge
