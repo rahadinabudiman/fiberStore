@@ -6,20 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository interface {
-	InsertOne(req *models.User) (*models.User, error)
-	FindOneById(id int) (*models.User, error)
-	FindOneByUsername(username string) (*models.User, error)
-	FindAll(page, limit int, search string) (*[]models.User, int, error)
-	UpdateOne(req *models.User) (*models.User, error)
-	DeleteOne(user *models.User) error
-}
-
 type userRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
+func NewUserRepository(db *gorm.DB) models.UserRepository {
 	return &userRepository{db}
 }
 

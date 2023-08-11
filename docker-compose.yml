@@ -25,7 +25,7 @@ services:
       - "3306"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
-      - ./author/init.sql:/data/application/init.sql
+      - ./db/init.sql:/data/application/init.sql
     command: --init-file /data/application/init.sql
     networks:
       - fiberstore-network

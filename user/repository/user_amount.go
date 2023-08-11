@@ -6,18 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserAmountRepository interface {
-	InsertOne(req *models.UserAmount) (*models.UserAmount, error)
-	FindOne(id uint) (res *models.UserAmount, err error)
-	UpdateOne(req *models.UserAmount, id uint) (res *models.UserAmount, err error)
-	DeleteOne(req *models.UserAmount) error
-}
-
 type userAmountRepository struct {
 	db *gorm.DB
 }
 
-func NewUserAmountRepository(db *gorm.DB) UserAmountRepository {
+func NewUserAmountRepository(db *gorm.DB) models.UserAmountRepository {
 	return &userAmountRepository{db}
 }
 

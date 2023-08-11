@@ -1,6 +1,12 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"context"
+	"fiberStore/dtos"
+
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -8,4 +14,24 @@ type User struct {
 	Username string `json:"username" form:"username" binding:"required"`
 	Password string `json:"password" form:"password" binding:"required"`
 	Role     string `gorm:"type:enum('Customer', 'Admin');default:'Customer'; not-null" example:"Admin" json:"role" form:"role"`
+}
+
+type UserRepository interface {
+	InsertOne(req *User) (*User, error)
+	FindOneById(id int) (*User, error)
+	FindOneByUsername(username string) (*User, error)
+	FindAll(page, limit int, search string) (*[]User, int, error)
+	UpdateOne(req *User) (*User, error)
+	DeleteOne(user *User) error
+}
+
+type UserUsecase interface {
+	// Authentikasi User
+	LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.UserLoginRequest) (res *dtos.UserLoginResponse, err error)
+	// CRUD User
+	InsertOne(ctx context.Context, req *dtos.UserRegister) (res *dtos.UserRegisterResponse, err error)
+	FindOneById(ctx context.Context, id int) (res *dtos.UserProfileResponse, err error)
+	FindAll(ctx context.Context, page, limit int, search, sortBy string) (*[]dtos.UserDetailResponse, int, error)
+	UpdateOne(ctx context.Context, id int, req *dtos.UserUpdateProfile) (res *dtos.UserProfileResponse, err error)
+	DeleteOne(ctx context.Context, id uint, req dtos.DeleteUserRequest) error
 }

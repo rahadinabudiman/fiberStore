@@ -4,21 +4,17 @@ import (
 	"context"
 	"errors"
 	"fiberStore/dtos"
-	"fiberStore/user/repository"
+	"fiberStore/models"
 	"time"
 )
 
-type UserAmountUsecase interface {
-	TopUpSaldo(ctx context.Context, req *dtos.TopUpSaldoRequest) (res *dtos.TopUpSaldoResponse, err error)
-}
-
 type userAmountUsecase struct {
-	UserAmountRepository repository.UserAmountRepository
-	UserRepository       repository.UserRepository
+	UserAmountRepository models.UserAmountRepository
+	UserRepository       models.UserRepository
 	contextTimeout       time.Duration
 }
 
-func NewUserAmountUsecase(UserAmountRepository repository.UserAmountRepository, UserRepository repository.UserRepository, contextTimeout time.Duration) UserAmountUsecase {
+func NewUserAmountUsecase(UserAmountRepository models.UserAmountRepository, UserRepository models.UserRepository, contextTimeout time.Duration) models.UserAmountUsecase {
 	return &userAmountUsecase{
 		UserAmountRepository: UserAmountRepository,
 		UserRepository:       UserRepository,
