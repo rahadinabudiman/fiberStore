@@ -34,6 +34,17 @@ func (ur *userRepository) FindOneByUsername(username string) (*models.User, erro
 	return user, nil
 }
 
+func (ur *userRepository) FindOneAdmin(id uint) (*models.User, error) {
+	var user *models.User
+
+	err := ur.db.Model(&user).Where("id = ? AND role = 'Admin'", id).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (ur *userRepository) FindOneById(id int) (*models.User, error) {
 	var user *models.User
 

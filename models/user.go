@@ -10,15 +10,17 @@ import (
 
 type User struct {
 	gorm.Model
-	Name     string `json:"name" form:"name" binding:"required"`
-	Username string `json:"username" form:"username" binding:"required"`
-	Password string `json:"password" form:"password" binding:"required"`
-	Role     string `gorm:"type:enum('Customer', 'Admin');default:'Customer'; not-null" example:"Admin" json:"role" form:"role"`
+	Name                  string    `json:"name" form:"name" binding:"required"`
+	Username              string    `json:"username" form:"username" binding:"required"`
+	Password              string    `json:"password" form:"password" binding:"required"`
+	Role                  string    `gorm:"type:enum('Customer', 'Admin');default:'Customer'; not-null" example:"Admin" json:"role" form:"role"`
+	AdministratorProducts []Product `gorm:"foreignKey:AdministratorID" json:"-"`
 }
 
 type UserRepository interface {
 	InsertOne(req *User) (*User, error)
 	FindOneById(id int) (*User, error)
+	FindOneAdmin(id uint) (*User, error)
 	FindOneByUsername(username string) (*User, error)
 	FindAll(page, limit int, search string) (*[]User, int, error)
 	UpdateOne(req *User) (*User, error)
