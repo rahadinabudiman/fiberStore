@@ -13,6 +13,16 @@ type ProductRequest struct {
 	Image           string `json:"image" form:"image"`
 }
 
+type UpdateProductRequest struct {
+	Name     string `json:"name" form:"name"`
+	Detail   string `json:"detail" form:"detail"`
+	Slug     string `json:"slug" form:"slug"`
+	Price    int64  `json:"price" form:"price"`
+	Stock    int64  `json:"stock" form:"stock"`
+	Category string `json:"category" form:"category"`
+	Image    string `json:"image" form:"image"`
+}
+
 type InserProductRequest struct {
 	AdministratorID uint                  `json:"administrator_id" form:"administrator_id"`
 	Slug            string                `json:"slug" form:"slug"`

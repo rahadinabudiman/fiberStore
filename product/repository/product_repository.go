@@ -45,6 +45,26 @@ func (pr *productRepository) FindOneBySlug(slug string) (*models.Product, error)
 	return product, nil
 }
 
+func (pr *productRepository) FindByCategory(category string, page, limit int) (*[]models.Product, int, error) {
+	var (
+		product  *models.Product
+		products []models.Product
+		count    int64
+	)
+
+	err := pr.db.Model(&product).Where("category = ?", category).Count(&count).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	err = pr.db.Model(&product).Where("category = ?", category).Order("created_at desc").Offset((page - 1) * limit).Limit(limit).Find(&products).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return &products, 0, nil
+}
+
 func (pr *productRepository) FindAll(page, limit int) (*[]models.Product, int, error) {
 	var (
 		product  *models.Product
