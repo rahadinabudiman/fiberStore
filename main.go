@@ -63,6 +63,12 @@ func main() {
 		log.Fatal("Error migrating database")
 	}
 
+	// Seeding Data
+	err = author.AccountSeeder(database)
+	if err != nil {
+		log.Fatal("Error seeding data")
+	}
+
 	// Setup Context Timeout
 	CONTEXT_TIMEOUT, err := helpers.GetEnvInt("CONTEXT_TIMEOUT")
 	if err != nil {
