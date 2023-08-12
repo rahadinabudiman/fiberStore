@@ -9,7 +9,8 @@ import (
 
 type Product struct {
 	gorm.Model
-	AdministratorID uint   `json:"administrator_id" form:"administrator_id"`
+	AdministratorID uint   `gorm:"foreignKey:AdministratorRefer" json:"administrator_id" form:"administrator_id"`
+	Administrator   User   `gorm:"foreignKey:AdministratorID" json:"-"`
 	Slug            string `json:"slug" form:"slug"`
 	Name            string `json:"name" form:"name"`
 	Detail          string `json:"detail" form:"detail"`
@@ -22,6 +23,7 @@ type Product struct {
 type ProductRepository interface {
 	InsertOne(req *Product) (*Product, error)
 	FindOne(id int) (*Product, error)
+	FindOneBySlug(slug string) (*Product, error)
 	FindAll(page, limit int) (*[]Product, int, error)
 	FindQueryAll(page, limit int, search string) (*[]Product, int, error)
 	UpdateOne(req *Product) (*Product, error)
@@ -29,7 +31,7 @@ type ProductRepository interface {
 }
 
 type ProductUsecase interface {
-	InsertOne(ctx context.Context, req *dtos.ProductRequest) (*dtos.ProductResponse, error)
+	InsertOne(ctx context.Context, req *dtos.InserProductRequest, url string) (*dtos.InserProductResponse, error)
 	FindAll(ctx context.Context, page, limit int) (*[]dtos.ProductResponse, int, error)
 	FindQueryAll(ctx context.Context, page, limit int, search string) (*[]dtos.ProductResponse, int, error)
 	FindOne(ctx context.Context, id uint) (*dtos.ProductResponse, error)
