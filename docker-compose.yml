@@ -24,6 +24,7 @@ services:
     ports:
       - "3306"
     volumes:
+      - db:/var/lib/mysql
       - ./db:/docker-entrypoint-initdb.d
       - ./db/init.sql:/data/application/init.sql
     command: --init-file /data/application/init.sql
@@ -34,3 +35,7 @@ services:
 networks:
   fiberstore-network:
     driver: bridge
+
+volumes:
+  db:
+    driver: local
