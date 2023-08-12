@@ -71,7 +71,7 @@ func InitMySQL() (*gorm.DB, error) {
 }
 
 func AccountSeeder(db *gorm.DB) error {
-	password := os.Getenv("PASSWORD_SEEDER")
+	password := "$2a$10$RQ.ycP2DqXWYYDdcYuO6hebdgWOTIPpMEE8d6.ntVTDE21f6RkZKG"
 	users := []models.User{
 		{
 			Name:     "Administrator",
