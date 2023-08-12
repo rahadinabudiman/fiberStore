@@ -70,6 +70,42 @@ func InitMySQL() (*gorm.DB, error) {
 	return DB, nil
 }
 
+func AccountSeeder(db *gorm.DB) error {
+	password := os.Getenv("PASSWORD_SEEDER")
+	users := []models.User{
+		{
+			Name:     "Administrator",
+			Username: "admin",
+			Password: password,
+			Role:     "Admin",
+		},
+		{
+			Name:     "Customer",
+			Username: "customer",
+			Password: password,
+			Role:     "Customer",
+		},
+	}
+
+	for _, user := range users {
+		// Check Data if already seeding
+		var count int64
+		if err := db.Model(&models.User{}).Where(&user).Count(&count).Error; err != nil {
+			return err
+		}
+
+		// If data exists, skip seeding
+		if count > 0 {
+			continue
+		}
+		if err := db.Create(&user).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func MigrateDB(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&models.User{},
