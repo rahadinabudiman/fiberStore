@@ -2,8 +2,12 @@ package main
 
 import (
 	"fiberStore/author"
+	_cloudinarUsecase "fiberStore/cloudinary/usecase"
 	"fiberStore/helpers"
 	"fiberStore/middlewares"
+	_productHandler "fiberStore/product/delivery/http"
+	_productRepository "fiberStore/product/repository"
+	_productUsecase "fiberStore/product/usecase"
 	_userHandler "fiberStore/user/delivery/http"
 	_userRepository "fiberStore/user/repository"
 	_userUsecase "fiberStore/user/usecase"
@@ -73,6 +77,11 @@ func main() {
 	UserUsecase := _userUsecase.NewUserUsecase(UserRepository, UserAmountRepository, timeoutContext)
 	_userHandler.NewUserAmountHandler(admin.(*fiber.Group), UserAmountUsecase, UserUsecase, myValidator.GetValidator())
 	_userHandler.NewUserHandler(api.(*fiber.Group), customer.(*fiber.Group), admin.(*fiber.Group), UserUsecase, myValidator.GetValidator())
+
+	cloudinaryUsecase := _cloudinarUsecase.NewMediaUpload()
+	productRepository := _productRepository.NewProductRepository(database)
+	productUsecase := _productUsecase.NewProductUsecase(productRepository, UserRepository, timeoutContext)
+	_productHandler.NewProductHandler(api.(*fiber.Group), admin.(*fiber.Group), productUsecase, cloudinaryUsecase, myValidator.GetValidator())
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")

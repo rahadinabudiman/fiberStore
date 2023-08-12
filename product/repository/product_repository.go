@@ -34,6 +34,17 @@ func (pr *productRepository) FindOne(id int) (*models.Product, error) {
 	return product, nil
 }
 
+func (pr *productRepository) FindOneBySlug(slug string) (*models.Product, error) {
+	var product *models.Product
+
+	err := pr.db.Model(&product).Where("slug = ?", slug).First(&product).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return product, nil
+}
+
 func (pr *productRepository) FindAll(page, limit int) (*[]models.Product, int, error) {
 	var (
 		product  *models.Product
