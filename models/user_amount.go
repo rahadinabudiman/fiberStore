@@ -9,7 +9,8 @@ import (
 
 type UserAmount struct {
 	gorm.Model
-	UserID uint    `json:"user_id" form:"user_id"`
+	UserID uint    `gorm:"foreignKey:UserAmountRefer" json:"user_id" form:"user_id"`
+	User   User    `gorm:"foreignKey:UserID;references:ID" json:"-"`
 	Amount float64 `json:"amount" form:"amount"`
 }
 

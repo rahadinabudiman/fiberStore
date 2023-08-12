@@ -18,6 +18,7 @@ type ProductHandler interface {
 	FindQueryAll(c *fiber.Ctx) error
 	FindAll(c *fiber.Ctx) error
 	UpdateOne(c *fiber.Ctx) error
+	DeleteOne(c *fiber.Ctx) error
 }
 
 type productHandler struct {
