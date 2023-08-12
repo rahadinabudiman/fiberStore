@@ -2,6 +2,9 @@ package main
 
 import (
 	"fiberStore/author"
+	_cartHandler "fiberStore/cart/delivery/http"
+	_cartRepository "fiberStore/cart/repository"
+	_cartUsecase "fiberStore/cart/usecase"
 	_cloudinarUsecase "fiberStore/cloudinary/usecase"
 	"fiberStore/helpers"
 	"fiberStore/middlewares"
@@ -88,6 +91,10 @@ func main() {
 	productRepository := _productRepository.NewProductRepository(database)
 	productUsecase := _productUsecase.NewProductUsecase(productRepository, UserRepository, timeoutContext)
 	_productHandler.NewProductHandler(api.(*fiber.Group), admin.(*fiber.Group), productUsecase, cloudinaryUsecase, myValidator.GetValidator())
+
+	cartRepository := _cartRepository.NewCartRepository(database)
+	cartUsecase := _cartUsecase.NewCartUsecase(cartRepository, productRepository, UserRepository, timeoutContext)
+	_cartHandler.NewCartHandler(api.(*fiber.Group), cartUsecase, myValidator.GetValidator())
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
