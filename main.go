@@ -2,12 +2,26 @@ package main
 
 import (
 	"fiberStore/author"
+	_cartHandler "fiberStore/cart/delivery/http"
+	_cartRepository "fiberStore/cart/repository"
+	_cartUsecase "fiberStore/cart/usecase"
+	_cloudinarUsecase "fiberStore/cloudinary/usecase"
+	"fiberStore/helpers"
+	"fiberStore/middlewares"
+	_productHandler "fiberStore/product/delivery/http"
+	_productRepository "fiberStore/product/repository"
+	_productUsecase "fiberStore/product/usecase"
+	_userHandler "fiberStore/user/delivery/http"
+	_userRepository "fiberStore/user/repository"
+	_userUsecase "fiberStore/user/usecase"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/joho/godotenv"
@@ -20,6 +34,19 @@ func main() {
 	app.Use(cors.New())
 	// Initialize default config for logger middleware
 	app.Use(logger.New())
+	app.Use(encryptcookie.New(encryptcookie.Config{
+		Key: os.Getenv("COOKIE_KEY"),
+	}))
+
+	api := app.Group("/api/v1")
+	customer := api.Group("/user")
+	admin := api.Group("/admin")
+
+	myValidator := helpers.NewXValidator()
+
+	// Setup Security Routes
+	customer.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("Customer"))
+	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("Admin"))
 
 	// Load .env file
 	err := godotenv.Load()
@@ -39,13 +66,40 @@ func main() {
 		log.Fatal("Error migrating database")
 	}
 
+	// Seeding Data
+	err = author.AccountSeeder(database)
+	if err != nil {
+		log.Fatal("Error seeding data")
+	}
+
+	// Setup Context Timeout
+	CONTEXT_TIMEOUT, err := helpers.GetEnvInt("CONTEXT_TIMEOUT")
+	if err != nil {
+		log.Fatal(err)
+	}
+	timeoutContext := time.Duration(CONTEXT_TIMEOUT) * time.Second
+
+	// Setup Routes
+	UserAmountRepository := _userRepository.NewUserAmountRepository(database)
+	UserRepository := _userRepository.NewUserRepository(database)
+	UserAmountUsecase := _userUsecase.NewUserAmountUsecase(UserAmountRepository, UserRepository, timeoutContext)
+	UserUsecase := _userUsecase.NewUserUsecase(UserRepository, UserAmountRepository, timeoutContext)
+	_userHandler.NewUserAmountHandler(admin.(*fiber.Group), UserAmountUsecase, UserUsecase, myValidator.GetValidator())
+	_userHandler.NewUserHandler(api.(*fiber.Group), customer.(*fiber.Group), admin.(*fiber.Group), UserUsecase, myValidator.GetValidator())
+
+	cloudinaryUsecase := _cloudinarUsecase.NewMediaUpload()
+	productRepository := _productRepository.NewProductRepository(database)
+	productUsecase := _productUsecase.NewProductUsecase(productRepository, UserRepository, timeoutContext)
+	_productHandler.NewProductHandler(api.(*fiber.Group), admin.(*fiber.Group), productUsecase, cloudinaryUsecase, myValidator.GetValidator())
+
+	cartRepository := _cartRepository.NewCartRepository(database)
+	cartUsecase := _cartUsecase.NewCartUsecase(cartRepository, productRepository, UserRepository, timeoutContext)
+	_cartHandler.NewCartHandler(api.(*fiber.Group), cartUsecase, myValidator.GetValidator())
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 
-	// api := app.Group("/api/v1")
-
 	appPort := fmt.Sprintf(":%s", os.Getenv("SERVER_ADDRESS"))
 	log.Fatal(app.Listen(appPort))
-
 }

@@ -1,6 +1,6 @@
-FROM golang:1.20-alpine
+FROM golang:alpine
 
-RUN apk update && apk add git
+RUN apk update && apk add --no-cache git
 
 RUN apk add --no-cache nginx
 
@@ -18,6 +18,6 @@ COPY . .
 # Build aplikasi
 RUN go build -o main .
 
-# EXPOSE 443
+EXPOSE 1309
 
 CMD ["./main"]
