@@ -111,5 +111,6 @@ func MigrateDB(db *gorm.DB) error {
 		&models.User{},
 		&models.UserAmount{},
 		&models.Product{},
+		&models.Cart{},
 	)
 }
