@@ -18,6 +18,6 @@ COPY . .
 # Build aplikasi
 RUN go build -o main .
 
-EXPOSE 8080
+EXPOSE 1309
 
 CMD ["./main"]

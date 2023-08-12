@@ -8,7 +8,7 @@ services:
     image: fiberstore
     container_name: fiberstore
     ports:
-      - "8080:8080"
+      - "1309:1309"
     networks:
       - fiberstore-network
     depends_on:
