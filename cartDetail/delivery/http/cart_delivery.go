@@ -10,33 +10,33 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type CartHandler interface {
+type CartDetailHandler interface {
 	InsertOne(c *fiber.Ctx) error
-	GetCart(c *fiber.Ctx) error
+	GetCartDetail(c *fiber.Ctx) error
 	DeleteProduct(c *fiber.Ctx) error
 }
 
-type cartHandler struct {
-	CartUsecase models.CartUsecase
-	validator   *validator.Validate
+type cartDetailHandler struct {
+	CartDetailUsecase models.CartDetailUsecase
+	validator         *validator.Validate
 }
 
-func NewCartHandler(protected *fiber.Group, CartUsecase models.CartUsecase, validator *validator.Validate) CartHandler {
-	handler := &cartHandler{
-		CartUsecase: CartUsecase,
-		validator:   validator,
+func NewCartDetailHandler(protected *fiber.Group, CartDetailUsecase models.CartDetailUsecase, validator *validator.Validate) CartDetailHandler {
+	handler := &cartDetailHandler{
+		CartDetailUsecase: CartDetailUsecase,
+		validator:         validator,
 	}
 
 	// Protected User Routes
 	protected.Post("/cart", handler.InsertOne)
-	protected.Get("/cart", handler.GetCart)
+	protected.Get("/cart", handler.GetCartDetail)
 	protected.Delete("/cart/:product_id", handler.DeleteProduct)
 
 	return handler
 }
 
-func (ch *cartHandler) InsertOne(c *fiber.Ctx) error {
-	var req dtos.InsertCartRequest
+func (ch *cartDetailHandler) InsertOne(c *fiber.Ctx) error {
+	var req dtos.InsertCartDetailRequest
 
 	token := middlewares.GetTokenFromHeader(c)
 	if token == "" {
@@ -83,12 +83,12 @@ func (ch *cartHandler) InsertOne(c *fiber.Ctx) error {
 
 	ctx := c.Context()
 
-	result, err := ch.CartUsecase.InsertOne(ctx, &req)
+	result, err := ch.CartDetailUsecase.InsertOne(ctx, &req)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			dtos.NewErrorResponse(
 				fiber.StatusBadRequest,
-				"error inserting cart",
+				"error inserting CartDetail",
 				dtos.GetErrorData(err),
 			),
 		)
@@ -97,13 +97,13 @@ func (ch *cartHandler) InsertOne(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(
 		dtos.NewResponse(
 			fiber.StatusCreated,
-			"success inserting cart",
+			"success inserting CartDetail",
 			result,
 		),
 	)
 }
 
-func (ch *cartHandler) GetCart(c *fiber.Ctx) error {
+func (ch *cartDetailHandler) GetCartDetail(c *fiber.Ctx) error {
 	token := middlewares.GetTokenFromHeader(c)
 	if token == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(
@@ -127,12 +127,12 @@ func (ch *cartHandler) GetCart(c *fiber.Ctx) error {
 
 	ctx := c.Context()
 
-	result, err := ch.CartUsecase.FindAll(ctx, userID)
+	result, err := ch.CartDetailUsecase.FindAll(ctx, userID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			dtos.NewErrorResponse(
 				fiber.StatusBadRequest,
-				"error getting carts",
+				"error getting CartDetails",
 				dtos.GetErrorData(err),
 			),
 		)
@@ -141,13 +141,13 @@ func (ch *cartHandler) GetCart(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(
 		dtos.NewResponse(
 			fiber.StatusOK,
-			"success getting carts",
+			"success getting CartDetails",
 			result,
 		),
 	)
 }
 
-func (ch *cartHandler) DeleteProduct(c *fiber.Ctx) error {
+func (ch *cartDetailHandler) DeleteProduct(c *fiber.Ctx) error {
 	token := middlewares.GetTokenFromHeader(c)
 	if token == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(
@@ -182,7 +182,7 @@ func (ch *cartHandler) DeleteProduct(c *fiber.Ctx) error {
 
 	ctx := c.Context()
 
-	err = ch.CartUsecase.DeleteProduct(ctx, userID, uint(productID))
+	err = ch.CartDetailUsecase.DeleteProduct(ctx, userID, uint(productID))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			dtos.NewErrorResponse(
