@@ -45,24 +45,25 @@ func (pr *productRepository) FindOneBySlug(slug string) (*models.Product, error)
 	return product, nil
 }
 
-func (pr *productRepository) FindByCategory(category string, page, limit int) (*[]models.Product, int, error) {
+func (pr *productRepository) FindByCategory(page, limit int, search string) (*[]models.Product, int, error) {
 	var (
-		product  *models.Product
 		products []models.Product
 		count    int64
 	)
 
-	err := pr.db.Model(&product).Where("category = ?", category).Count(&count).Error
+	err := pr.db.Unscoped().Model(models.Product{}).Where("category LIKE ?", "%"+search+"%").Count(&count).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
-	err = pr.db.Model(&product).Where("category = ?", category).Order("created_at desc").Offset((page - 1) * limit).Limit(limit).Find(&products).Error
+	offset := (page - 1) * limit
+
+	err = pr.db.Unscoped().Where("category LIKE ?", "%"+search+"%").Order("created_at DESC").Limit(limit).Offset(offset).Find(&products).Error
 	if err != nil {
-		return nil, 0, err
+		return nil, int(count), err
 	}
 
-	return &products, 0, nil
+	return &products, int(count), nil
 }
 
 func (pr *productRepository) FindAll(page, limit int) (*[]models.Product, int, error) {

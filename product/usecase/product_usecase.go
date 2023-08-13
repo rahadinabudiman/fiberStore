@@ -134,7 +134,7 @@ func (pu *productUsecase) FindAllByCategory(ctx context.Context, page, limit int
 	_, cancel := context.WithTimeout(ctx, pu.contextTimeout)
 	defer cancel()
 
-	products, count, err := pu.ProductRepository.FindByCategory(category, page, limit)
+	products, count, err := pu.ProductRepository.FindByCategory(page, limit, category)
 	if err != nil {
 		return nil, 0, errors.New("error getting products")
 	}
@@ -206,6 +206,7 @@ func (pu *productUsecase) UpdateOne(ctx context.Context, req *dtos.UpdateProduct
 		}
 
 		req.Slug = slug
+		product.Slug = slug
 	}
 
 	if req.Name != "" && req.Detail != "" && req.Price != 0 && req.Stock != 0 && req.Category != "" {

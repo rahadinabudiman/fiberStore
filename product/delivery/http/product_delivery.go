@@ -14,6 +14,7 @@ import (
 type ProductHandler interface {
 	InsertProduct(c *fiber.Ctx) error
 	FindOneProduct(c *fiber.Ctx) error
+	FindProducts(c *fiber.Ctx) error
 	FindAllByCategory(c *fiber.Ctx) error
 	FindQueryAll(c *fiber.Ctx) error
 	FindAll(c *fiber.Ctx) error
@@ -35,15 +36,15 @@ func NewProductHandler(api *fiber.Group, admin *fiber.Group, ProductUsecase mode
 	}
 
 	// Public Routes
-	api.Get("/product/:id", handler.FindOneProduct)
-	api.Get("/product", handler.FindQueryAll)
+	api.Get("/product/findById", handler.FindOneProduct)
+	api.Get("/product/findByName", handler.FindQueryAll)
 	api.Get("/product", handler.FindAll)
-	api.Get("/product/", handler.FindAllByCategory)
+	api.Get("/product/findByCategory", handler.FindAllByCategory)
 
 	// Protected Admin Routes
-	admin.Post("/product", handler.InsertProduct)
-	admin.Put("/product/:id", handler.UpdateOne)
-	admin.Delete("/product/:id", handler.DeleteOne)
+	api.Post("/product", handler.InsertProduct)
+	api.Put("/product/:id", handler.UpdateOne)
+	api.Delete("/product/:id", handler.DeleteOne)
 
 	return handler
 }
@@ -179,22 +180,57 @@ func (pd *productHandler) InsertProduct(c *fiber.Ctx) error {
 	)
 }
 
+func (pd *productHandler) FindProducts(c *fiber.Ctx) error {
+	ctx := c.Context()
+
+	pageParam := c.QueryInt("page", 1)
+	limitParam := c.QueryInt("limit", 10)
+	nameParam := c.Query("name")
+	categoryParam := c.Query("category")
+
+	var result interface{}
+	var count int
+	var err error
+
+	switch {
+	case nameParam != "":
+		result, count, err = pd.ProductUsecase.FindQueryAll(ctx, pageParam, limitParam, nameParam)
+	case categoryParam != "":
+		result, count, err = pd.ProductUsecase.FindAllByCategory(ctx, pageParam, limitParam, categoryParam)
+	default:
+		result, count, err = pd.ProductUsecase.FindAll(ctx, pageParam, limitParam)
+	}
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error getting products",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(
+		dtos.NewPaginationResponse(
+			fiber.StatusOK,
+			"success getting products",
+			result,
+			pageParam,
+			limitParam,
+			count,
+		),
+	)
+}
+
 func (pd *productHandler) FindAllByCategory(c *fiber.Ctx) error {
 	ctx := c.Context()
 
-	pageParam := c.QueryInt("page")
-	if pageParam == 0 {
-		pageParam = 1
-	}
+	pageParam := c.QueryInt("page", 1)
+	limitParam := c.QueryInt("limit", 10)
+	searchParam := c.Query("category")
 
-	limitParam := c.QueryInt("limit")
-	if limitParam == 0 {
-		limitParam = 10
-	}
-
-	categoryParam := c.Query("category")
-
-	result, count, err := pd.ProductUsecase.FindAllByCategory(ctx, pageParam, limitParam, categoryParam)
+	result, count, err := pd.ProductUsecase.FindAllByCategory(ctx, pageParam, limitParam, searchParam)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			dtos.NewErrorResponse(
@@ -218,16 +254,7 @@ func (pd *productHandler) FindAllByCategory(c *fiber.Ctx) error {
 }
 
 func (pd *productHandler) FindOneProduct(c *fiber.Ctx) error {
-	ProductID, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(
-			dtos.NewErrorResponse(
-				fiber.StatusBadRequest,
-				"error parsing request body",
-				dtos.GetErrorData(err),
-			),
-		)
-	}
+	ProductID := c.QueryInt("id")
 
 	ctx := c.Context()
 
@@ -254,17 +281,10 @@ func (pd *productHandler) FindOneProduct(c *fiber.Ctx) error {
 func (pd *productHandler) FindQueryAll(c *fiber.Ctx) error {
 	ctx := c.Context()
 
-	pageParam := c.QueryInt("page")
-	if pageParam == 0 {
-		pageParam = 1
-	}
+	pageParam := c.QueryInt("page", 1)
+	limitParam := c.QueryInt("limit", 10)
+	searchParam := c.Query("name")
 
-	limitParam := c.QueryInt("limit")
-	if limitParam == 0 {
-		limitParam = 10
-	}
-
-	searchParam := c.Query("search")
 	result, count, err := pd.ProductUsecase.FindQueryAll(ctx, pageParam, limitParam, searchParam)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
@@ -291,15 +311,8 @@ func (pd *productHandler) FindQueryAll(c *fiber.Ctx) error {
 func (pd *productHandler) FindAll(c *fiber.Ctx) error {
 	ctx := c.Context()
 
-	pageParam := c.QueryInt("page")
-	if pageParam == 0 {
-		pageParam = 1
-	}
-
-	limitParam := c.QueryInt("limit")
-	if limitParam == 0 {
-		limitParam = 10
-	}
+	pageParam := c.QueryInt("page", 1)
+	limitParam := c.QueryInt("limit", 10)
 
 	result, count, err := pd.ProductUsecase.FindAll(ctx, pageParam, limitParam)
 	if err != nil {
