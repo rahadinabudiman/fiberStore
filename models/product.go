@@ -24,7 +24,7 @@ type ProductRepository interface {
 	InsertOne(req *Product) (*Product, error)
 	FindOne(id int) (*Product, error)
 	FindOneBySlug(slug string) (*Product, error)
-	FindByCategory(category string, page, limit int) (*[]Product, int, error)
+	FindByCategory(page, limit int, search string) (*[]Product, int, error)
 	FindAll(page, limit int) (*[]Product, int, error)
 	FindQueryAll(page, limit int, search string) (*[]Product, int, error)
 	UpdateOne(req *Product) (*Product, error)

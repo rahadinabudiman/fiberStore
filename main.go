@@ -12,6 +12,9 @@ import (
 	_productHandler "fiberStore/product/delivery/http"
 	_productRepository "fiberStore/product/repository"
 	_productUsecase "fiberStore/product/usecase"
+	_TransactionHandler "fiberStore/transaction/delivery/http"
+	_TransactionRepository "fiberStore/transaction/repository"
+	_TransactionUsecase "fiberStore/transaction/usecase"
 	_userHandler "fiberStore/user/delivery/http"
 	_userRepository "fiberStore/user/repository"
 	_userUsecase "fiberStore/user/usecase"
@@ -99,6 +102,10 @@ func main() {
 	CartDetailRepository := _CartDetailRepository.NewCartDetailRepository(database)
 	CartDetailUsecase := _CartDetailUsecase.NewCartDetailUsecase(CartDetailRepository, CartRepository, productRepository, UserRepository, timeoutContext)
 	_CartDetailHandler.NewCartDetailHandler(api.(*fiber.Group), CartDetailUsecase, myValidator.GetValidator())
+
+	TransactionRepository := _TransactionRepository.NewTransactionRepository(database)
+	TransactionUsecase := _TransactionUsecase.NewTransactionUsecase(TransactionRepository, CartRepository, CartDetailRepository, productRepository, UserRepository, UserAmountRepository, timeoutContext)
+	_TransactionHandler.NewTransactionHandler(api.(*fiber.Group), TransactionUsecase, myValidator.GetValidator())
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
