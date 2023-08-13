@@ -51,14 +51,14 @@ func (pr *productRepository) FindByCategory(page, limit int, search string) (*[]
 		count    int64
 	)
 
-	err := pr.db.Unscoped().Model(models.Product{}).Where("category LIKE ?", "%"+search+"%").Count(&count).Error
+	err := pr.db.Model(models.Product{}).Where("category LIKE ?", "%"+search+"%").Count(&count).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
 	offset := (page - 1) * limit
 
-	err = pr.db.Unscoped().Where("category LIKE ?", "%"+search+"%").Order("created_at DESC").Limit(limit).Offset(offset).Find(&products).Error
+	err = pr.db.Where("category LIKE ?", "%"+search+"%").Order("created_at DESC").Limit(limit).Offset(offset).Find(&products).Error
 	if err != nil {
 		return nil, int(count), err
 	}
@@ -87,21 +87,21 @@ func (pr *productRepository) FindAll(page, limit int) (*[]models.Product, int, e
 }
 
 func (pr *productRepository) FindQueryAll(page, limit int, search string) (*[]models.Product, int, error) {
-	var products []models.Product
-	var count int64
+	var (
+		products []models.Product
+		count    int64
+	)
 
-	if search != "" {
-		pr.db = pr.db.Where("name LIKE ?", "%"+search+"%")
-	}
-
-	err := pr.db.Model(&products).Count(&count).Error
+	err := pr.db.Model(models.Product{}).Where("name LIKE ?", "%"+search+"%").Count(&count).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
-	err = pr.db.Offset((page - 1) * limit).Limit(limit).Find(&products).Error
+	offset := (page - 1) * limit
+
+	err = pr.db.Where("name LIKE ?", "%"+search+"%").Order("created_at DESC").Limit(limit).Offset(offset).Find(&products).Error
 	if err != nil {
-		return nil, 0, err
+		return nil, int(count), err
 	}
 
 	return &products, int(count), nil
