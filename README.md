@@ -6,9 +6,9 @@
 
 - Browse Products: Users can view a list of available products with their details.
 - Browse by Category: Customers can view product lists by product category.
-- Add to Cart: Customers can add products to their shopping cart.
-- View Cart: Customers can see a list of products that have been added to the shopping cart.
-- Remove from Cart: Customers can delete products from the shopping cart.
+- Add to cart: Customers can add products to their shopping cart.
+- View cart: Customers can see a list of products that have been added to the shopping cart.
+- Remove from cart: Customers can delete products from the shopping cart.
 - Checkout and Payment: Customers can proceed to checkout and make payment transactions.
 - User Authentication: Customers can create accounts, log in, and manage their profiles.
 
