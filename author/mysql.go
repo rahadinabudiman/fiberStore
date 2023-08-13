@@ -101,6 +101,28 @@ func AccountSeeder(db *gorm.DB) error {
 		if err := db.Create(&user).Error; err != nil {
 			return err
 		}
+
+		// Create User Amount
+		userAmount := models.UserAmount{
+			UserID: user.ID,
+			Amount: 0,
+		}
+
+		// Check user amount if already seeding
+		var countUserAmount int64
+		if err := db.Model(&models.UserAmount{}).Where(&userAmount).Count(&countUserAmount).Error; err != nil {
+			return err
+		}
+
+		// If data exists, skip seeding
+		if countUserAmount > 0 {
+			continue
+		}
+
+		if err := db.Create(&userAmount).Error; err != nil {
+			return err
+		}
+
 	}
 
 	return nil
@@ -112,5 +134,7 @@ func MigrateDB(db *gorm.DB) error {
 		&models.UserAmount{},
 		&models.Product{},
 		&models.Cart{},
+		&models.CartDetail{},
+		&models.Transaction{},
 	)
 }
