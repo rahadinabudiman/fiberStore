@@ -2,9 +2,10 @@ package main
 
 import (
 	"fiberStore/author"
-	_cartHandler "fiberStore/cart/delivery/http"
 	_cartRepository "fiberStore/cart/repository"
-	_cartUsecase "fiberStore/cart/usecase"
+	_CartDetailHandler "fiberStore/cartDetail/delivery/http"
+	_CartDetailRepository "fiberStore/cartDetail/repository"
+	_CartDetailUsecase "fiberStore/cartDetail/usecase"
 	_cloudinarUsecase "fiberStore/cloudinary/usecase"
 	"fiberStore/helpers"
 	"fiberStore/middlewares"
@@ -92,9 +93,12 @@ func main() {
 	productUsecase := _productUsecase.NewProductUsecase(productRepository, UserRepository, timeoutContext)
 	_productHandler.NewProductHandler(api.(*fiber.Group), admin.(*fiber.Group), productUsecase, cloudinaryUsecase, myValidator.GetValidator())
 
-	cartRepository := _cartRepository.NewCartRepository(database)
-	cartUsecase := _cartUsecase.NewCartUsecase(cartRepository, productRepository, UserRepository, timeoutContext)
-	_cartHandler.NewCartHandler(api.(*fiber.Group), cartUsecase, myValidator.GetValidator())
+	CartRepository := _cartRepository.NewCartRepository(database)
+	// CartUsecase := _cartUsecase.NewCartUsecase(CartRepository, timeoutContext)
+
+	CartDetailRepository := _CartDetailRepository.NewCartDetailRepository(database)
+	CartDetailUsecase := _CartDetailUsecase.NewCartDetailUsecase(CartDetailRepository, CartRepository, productRepository, UserRepository, timeoutContext)
+	_CartDetailHandler.NewCartDetailHandler(api.(*fiber.Group), CartDetailUsecase, myValidator.GetValidator())
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")

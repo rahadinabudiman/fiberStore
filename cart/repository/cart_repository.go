@@ -23,34 +23,15 @@ func (r *cartRepository) InsertOne(req *models.Cart) (*models.Cart, error) {
 	return req, nil
 }
 
-func (r *cartRepository) FindOne(userID, productID uint) (res *models.Cart, err error) {
+func (r *cartRepository) FindOne(userID uint) (res *models.Cart, err error) {
 	var cart models.Cart
 
-	err = r.db.Model(&cart).Where("user_id = ? AND product_id = ?", userID, productID).First(&cart).Error
+	err = r.db.Model(&cart).Where("user_id = ?", userID).First(&cart).Error
 	if err != nil {
 		return nil, err
 	}
 
 	return &cart, nil
-}
-
-func (r *cartRepository) FindAll(userID uint) (*[]models.Cart, error) {
-	var res []models.Cart
-	err := r.db.Where("user_id = ?", userID).Find(&res).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return &res, nil
-}
-
-func (r *cartRepository) UpdateOne(req *models.Cart, id uint) (res *models.Cart, err error) {
-	err = r.db.Where("id = ?", id).Updates(&req).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
 }
 
 func (r *cartRepository) DeleteOne(req *models.Cart) error {
