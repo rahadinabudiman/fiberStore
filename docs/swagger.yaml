@@ -1,0 +1,493 @@
+basePath: /api/v1
+definitions:
+  dtos.BadRequestResponse:
+    properties:
+      errors: {}
+      message:
+        example: Bad Request
+        type: string
+      status_code:
+        example: 400
+        type: integer
+    type: object
+  dtos.DeleteUserRequest:
+    properties:
+      password:
+        example: rahadinabudimansundara
+        minLength: 6
+        type: string
+    type: object
+  dtos.ForbiddenResponse:
+    properties:
+      errors: {}
+      message:
+        example: Forbidden
+        type: string
+      status_code:
+        example: 403
+        type: integer
+    type: object
+  dtos.GetAllUserStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.UserDetailResponse'
+      message:
+        example: Successfully get profile
+        type: string
+      meta:
+        $ref: '#/definitions/utils.Meta'
+      status_code:
+        example: 200
+        type: integer
+    type: object
+  dtos.InternalServerErrorResponse:
+    properties:
+      errors: {}
+      message:
+        example: Internal Server Error
+        type: string
+      status_code:
+        example: 500
+        type: integer
+    type: object
+  dtos.LoginStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.UserLoginResponse'
+      message:
+        example: Login Success
+        type: string
+      status_code:
+        example: 200
+        type: integer
+    type: object
+  dtos.NotFoundResponse:
+    properties:
+      errors: {}
+      message:
+        example: Not Found
+        type: string
+      status_code:
+        example: 404
+        type: integer
+    type: object
+  dtos.ProfileStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.UserProfileResponse'
+      message:
+        example: Get Profile Success
+        type: string
+      status_code:
+        example: 200
+        type: integer
+    type: object
+  dtos.RegisterStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.UserRegisterResponse'
+      message:
+        example: Register Success
+        type: string
+      status_code:
+        example: 200
+        type: integer
+    type: object
+  dtos.StatusOKResponse:
+    properties:
+      data: {}
+      message:
+        example: Successfully
+        type: string
+      status_code:
+        example: 200
+        type: integer
+    type: object
+  dtos.UnauthorizedResponse:
+    properties:
+      errors: {}
+      message:
+        example: Unauthorized
+        type: string
+      status_code:
+        example: 401
+        type: integer
+    type: object
+  dtos.UserDetailResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+      username:
+        type: string
+    type: object
+  dtos.UserLoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dtos.UserLoginResponse:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        type: string
+      username:
+        example: rahadinabudimansundara
+        type: string
+    required:
+    - token
+    - username
+    type: object
+  dtos.UserProfileResponse:
+    properties:
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  dtos.UserRegister:
+    properties:
+      confirm_password:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        example: Admin
+        type: string
+      username:
+        type: string
+    required:
+    - confirm_password
+    - name
+    - password
+    - username
+    type: object
+  dtos.UserRegisterResponse:
+    properties:
+      created_at:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  dtos.UserUpdateProfile:
+    properties:
+      name:
+        type: string
+      username:
+        type: string
+    required:
+    - name
+    - username
+    type: object
+  utils.Meta:
+    properties:
+      current_page:
+        example: 1
+        type: integer
+      next_page: {}
+      prev_page:
+        example: 1
+        type: integer
+      total:
+        example: 1
+        type: integer
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: 54.179.176.114:1309
+info:
+  contact:
+    name: r4ha
+    url: https://github.com/rahadinabudiman
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: FiberStore Documentation API
+  version: "1.0"
+paths:
+  /admin/user:
+    get:
+      consumes:
+      - application/json
+      description: Get all users
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search data
+        in: query
+        name: search
+        type: string
+      - description: Sort by name
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sortBy
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllUserStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - Admin - User
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login an account
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.LoginStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Login User with Username and Password
+      tags:
+      - User - Auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Login an account
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.RegisterStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Login User with Username and Password
+      tags:
+      - User - Auth
+  /user:
+    delete:
+      consumes:
+      - application/json
+      description: User delete an Profile
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.DeleteUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Profile
+      tags:
+      - User - Account
+    get:
+      consumes:
+      - application/json
+      description: User get profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ProfileStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Profile
+      tags:
+      - User - Account
+    put:
+      consumes:
+      - application/json
+      description: User update an Profile
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UserUpdateProfile'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ProfileStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Profile
+      tags:
+      - User - Account
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
