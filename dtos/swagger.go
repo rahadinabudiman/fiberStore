@@ -29,6 +29,31 @@ type GetAllUserStatusOKResponse struct {
 	Meta       utils.Meta         `json:"meta"`
 }
 
+// Product
+type InsertProductStatusOKResponse struct {
+	StatusCode int                  `json:"status_code" example:"200"`
+	Message    string               `json:"message" example:"Successfully insert product"`
+	Data       InserProductResponse `json:"data"`
+}
+
+type ProductStatusOKResponse struct {
+	StatusCode int                  `json:"status_code" example:"200"`
+	Message    string               `json:"message" example:"Successfully insert product"`
+	Data       InserProductResponse `json:"data"`
+}
+
+type ProductDeletedStatusOKResponse struct {
+	StatusCode int    `json:"status_code" example:"200"`
+	Message    string `json:"message" example:"Successfully deleted product"`
+}
+
+type GetAllProductStatusOKResponse struct {
+	StatusCode int               `json:"status_code" example:"200"`
+	Message    string            `json:"message" example:"Successfully get all product"`
+	Data       []ProductResponse `json:"data"`
+	Meta       utils.Meta        `json:"meta"`
+}
+
 type StatusOKResponse struct {
 	StatusCode int         `json:"status_code" example:"200"`
 	Message    string      `json:"message" example:"Successfully"`

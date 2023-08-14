@@ -23,6 +23,26 @@ func NewProductUsecase(ProductRepository models.ProductRepository, UserRepositor
 	}
 }
 
+// AddProduct godoc
+// @Summary Add Product
+// @Description Add Product
+// @Tags Admin - Product
+// @Accept multipart/form-data
+// @Produce json
+// @Param name formData string true "Product Name"
+// @Param detail formData string true "Product Detail"
+// @Param price formData int64 true "Product Price"
+// @Param stock formData int64 true "Product Stock"
+// @Param category formData string true "Product Category"
+// @Param image formData file false "Photo Product"
+// @Success 200 {object} dtos.InsertProductStatusOKResponse
+// @Failure 400 {object} dtos.BadRequestResponse
+// @Failure 401 {object} dtos.UnauthorizedResponse
+// @Failure 403 {object} dtos.ForbiddenResponse
+// @Failure 404 {object} dtos.NotFoundResponse
+// @Failure 500 {object} dtos.InternalServerErrorResponse
+// @Router /admin/product [post]
+// @Security BearerAuth
 func (pu *productUsecase) InsertOne(ctx context.Context, req *dtos.InserProductRequest, url string) (*dtos.InserProductResponse, error) {
 	_, cancel := context.WithTimeout(ctx, pu.contextTimeout)
 	defer cancel()
@@ -73,6 +93,21 @@ func (pu *productUsecase) InsertOne(ctx context.Context, req *dtos.InserProductR
 	return res, nil
 }
 
+// GetAllProduct godoc
+// @Summary      Get all products
+// @Description  Get all products
+// @Tags         Product
+// @Accept       json
+// @Produce      json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Success      200 {object} dtos.GetAllProductStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /product [get]
 func (pu *productUsecase) FindAll(ctx context.Context, page, limit int) (*[]dtos.ProductResponse, int, error) {
 	var productResponses []dtos.ProductResponse
 
@@ -100,6 +135,22 @@ func (pu *productUsecase) FindAll(ctx context.Context, page, limit int) (*[]dtos
 	return &productResponses, count, nil
 }
 
+// GetAllProductByName godoc
+// @Summary      Get all products by name
+// @Description  Get all products by name
+// @Tags         Product
+// @Accept       json
+// @Produce      json
+// @Param name query string false "Product name"
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Success      200 {object} dtos.GetAllProductStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /product/findByName [get]
 func (pu *productUsecase) FindQueryAll(ctx context.Context, page, limit int, search string) (*[]dtos.ProductResponse, int, error) {
 	var productResponses []dtos.ProductResponse
 
@@ -128,6 +179,22 @@ func (pu *productUsecase) FindQueryAll(ctx context.Context, page, limit int, sea
 	return &productResponses, count, nil
 }
 
+// GetAllProductByCategory godoc
+// @Summary      Get all products by Category
+// @Description  Get all products by Category
+// @Tags         Product
+// @Accept       json
+// @Produce      json
+// @Param category query string false "Product Category"
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Success      200 {object} dtos.GetAllProductStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /product/findByCategory [get]
 func (pu *productUsecase) FindAllByCategory(ctx context.Context, page, limit int, category string) (*[]dtos.ProductResponse, int, error) {
 	var productResponses []dtos.ProductResponse
 
@@ -181,6 +248,22 @@ func (pu *productUsecase) FindOne(ctx context.Context, id uint) (*dtos.ProductRe
 	return &productResponse, nil
 }
 
+// UpdateProduct godoc
+// @Summary      Update Product
+// @Description  Update Product
+// @Tags         Admin - Product
+// @Accept       json
+// @Produce      json
+// @Param id query int false "Product ID"
+// @Param        request body dtos.UpdateProductRequest true "Payload Body [RAW]"
+// @Success      200 {object} dtos.ProductStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/product/{id} [put]
+// @Security BearerAuth
 func (pu *productUsecase) UpdateOne(ctx context.Context, req *dtos.UpdateProductRequest, id, AdministratorID uint) (*dtos.ProductResponse, error) {
 	_, cancel := context.WithTimeout(ctx, pu.contextTimeout)
 	defer cancel()
@@ -240,6 +323,22 @@ func (pu *productUsecase) UpdateOne(ctx context.Context, req *dtos.UpdateProduct
 	return res, nil
 }
 
+// DeleteProduct godoc
+// @Summary      Delete Product
+// @Description  Delete Product
+// @Tags         Admin - Product
+// @Accept       json
+// @Produce      json
+// @Param id query int false "Product ID"
+// @Param        request body dtos.UpdateProductRequest true "Payload Body [RAW]"
+// @Success      200 {object} dtos.ProductDeletedStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/product/{id} [delete]
+// @Security BearerAuth
 func (pu *productUsecase) DeleteOne(ctx context.Context, id, AdministratorID uint) error {
 	_, cancel := context.WithTimeout(ctx, pu.contextTimeout)
 	defer cancel()

@@ -27,6 +27,21 @@ definitions:
         example: 403
         type: integer
     type: object
+  dtos.GetAllProductStatusOKResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dtos.ProductResponse'
+        type: array
+      message:
+        example: Successfully get all product
+        type: string
+      meta:
+        $ref: '#/definitions/utils.Meta'
+      status_code:
+        example: 200
+        type: integer
+    type: object
   dtos.GetAllUserStatusOKResponse:
     properties:
       data:
@@ -36,6 +51,34 @@ definitions:
         type: string
       meta:
         $ref: '#/definitions/utils.Meta'
+      status_code:
+        example: 200
+        type: integer
+    type: object
+  dtos.InserProductResponse:
+    properties:
+      category:
+        type: string
+      detail:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      slug:
+        type: string
+      stock:
+        type: integer
+    type: object
+  dtos.InsertProductStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.InserProductResponse'
+      message:
+        example: Successfully insert product
+        type: string
       status_code:
         example: 200
         type: integer
@@ -69,6 +112,45 @@ definitions:
         type: string
       status_code:
         example: 404
+        type: integer
+    type: object
+  dtos.ProductDeletedStatusOKResponse:
+    properties:
+      message:
+        example: Successfully deleted product
+        type: string
+      status_code:
+        example: 200
+        type: integer
+    type: object
+  dtos.ProductResponse:
+    properties:
+      category:
+        type: string
+      detail:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      slug:
+        type: string
+      stock:
+        type: integer
+    type: object
+  dtos.ProductStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.InserProductResponse'
+      message:
+        example: Successfully insert product
+        type: string
+      status_code:
+        example: 200
         type: integer
     type: object
   dtos.ProfileStatusOKResponse:
@@ -111,6 +193,23 @@ definitions:
         type: string
       status_code:
         example: 401
+        type: integer
+    type: object
+  dtos.UpdateProductRequest:
+    properties:
+      category:
+        type: string
+      detail:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      slug:
+        type: string
+      stock:
         type: integer
     type: object
   dtos.UserDetailResponse:
@@ -221,6 +320,168 @@ info:
   title: FiberStore Documentation API
   version: "1.0"
 paths:
+  /admin/product:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Add Product
+      parameters:
+      - description: Product Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Product Detail
+        in: formData
+        name: detail
+        required: true
+        type: string
+      - description: Product Price
+        in: formData
+        name: price
+        required: true
+        type: integer
+      - description: Product Stock
+        in: formData
+        name: stock
+        required: true
+        type: integer
+      - description: Product Category
+        in: formData
+        name: category
+        required: true
+        type: string
+      - description: Photo Product
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.InsertProductStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add Product
+      tags:
+      - Admin - Product
+  /admin/product/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Product
+      parameters:
+      - description: Product ID
+        in: query
+        name: id
+        type: integer
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ProductDeletedStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Product
+      tags:
+      - Admin - Product
+    put:
+      consumes:
+      - application/json
+      description: Update Product
+      parameters:
+      - description: Product ID
+        in: query
+        name: id
+        type: integer
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ProductStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Product
+      tags:
+      - Admin - Product
   /admin/user:
     get:
       consumes:
@@ -319,12 +580,152 @@ paths:
             $ref: '#/definitions/dtos.InternalServerErrorResponse'
       summary: Login User with Username and Password
       tags:
-      - User - Auth
+      - Authentikasi
+  /product:
+    get:
+      consumes:
+      - application/json
+      description: Get all products
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllProductStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Get all products
+      tags:
+      - Product
+  /product/findByCategory:
+    get:
+      consumes:
+      - application/json
+      description: Get all products by Category
+      parameters:
+      - description: Product Category
+        in: query
+        name: category
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllProductStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Get all products by Category
+      tags:
+      - Product
+  /product/findByName:
+    get:
+      consumes:
+      - application/json
+      description: Get all products by name
+      parameters:
+      - description: Product name
+        in: query
+        name: name
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllProductStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Get all products by name
+      tags:
+      - Product
   /register:
     post:
       consumes:
       - application/json
-      description: Login an account
+      description: Register an account
       parameters:
       - description: Payload Body [RAW]
         in: body
@@ -359,9 +760,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dtos.InternalServerErrorResponse'
-      summary: Login User with Username and Password
+      summary: Register User with Username and Password
       tags:
-      - User - Auth
+      - Authentikasi
   /user:
     delete:
       consumes:
