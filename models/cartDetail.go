@@ -15,7 +15,7 @@ type CartDetail struct {
 	User      User    `gorm:"foreignKey:UserID" json:"-"`
 	ProductID uint    `json:"product_id" form:"product_id"`
 	Product   Product `gorm:"foreignKey:ProductID" json:"-"`
-	Quantity  int     `json:"quantity" form:"quantity"`
+	Quantity  int64   `json:"quantity" form:"quantity"`
 }
 
 type CartDetailRepository interface {

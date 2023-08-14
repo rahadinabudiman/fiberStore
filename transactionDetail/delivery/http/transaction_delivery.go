@@ -9,19 +9,19 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type TransactionHandler interface {
+type TransactionDetailHandler interface {
 	InsertOne(c *fiber.Ctx) error
 }
 
-type transactionHandler struct {
-	TransactionUsecase models.TransactionUsecase
-	validator          *validator.Validate
+type transactionDetailHandler struct {
+	TransactionDetailUsecase models.TransactionDetailUsecase
+	validator                *validator.Validate
 }
 
-func NewTransactionHandler(protected *fiber.Group, TransactionUsecase models.TransactionUsecase, validator *validator.Validate) TransactionHandler {
-	handler := &transactionHandler{
-		TransactionUsecase: TransactionUsecase,
-		validator:          validator,
+func NewTransactionDetailHandler(protected *fiber.Group, TransactionDetailUsecase models.TransactionDetailUsecase, validator *validator.Validate) TransactionDetailHandler {
+	handler := &transactionDetailHandler{
+		TransactionDetailUsecase: TransactionDetailUsecase,
+		validator:                validator,
 	}
 
 	// Protected User Routes
@@ -30,8 +30,8 @@ func NewTransactionHandler(protected *fiber.Group, TransactionUsecase models.Tra
 	return handler
 }
 
-func (th *transactionHandler) InsertOne(c *fiber.Ctx) error {
-	var req models.Transaction
+func (th *transactionDetailHandler) InsertOne(c *fiber.Ctx) error {
+	var req models.TransactionDetail
 
 	token := middlewares.GetTokenFromHeader(c)
 	if token == "" {
@@ -78,7 +78,7 @@ func (th *transactionHandler) InsertOne(c *fiber.Ctx) error {
 		)
 	}
 
-	res, err := th.TransactionUsecase.InsertOne(c.Context(), &req)
+	res, err := th.TransactionDetailUsecase.InsertOne(c.Context(), &req)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			dtos.NewErrorResponse(

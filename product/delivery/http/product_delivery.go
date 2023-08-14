@@ -42,9 +42,9 @@ func NewProductHandler(api *fiber.Group, admin *fiber.Group, ProductUsecase mode
 	api.Get("/product/findByCategory", handler.FindAllByCategory)
 
 	// Protected Admin Routes
-	api.Post("/product", handler.InsertProduct)
-	api.Put("/product/:id", handler.UpdateOne)
-	api.Delete("/product/:id", handler.DeleteOne)
+	admin.Post("/product", handler.InsertProduct)
+	admin.Put("/product/:id", handler.UpdateOne)
+	admin.Delete("/product/:id", handler.DeleteOne)
 
 	return handler
 }
