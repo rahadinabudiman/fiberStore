@@ -21,3 +21,7 @@ type DetailTransactionDetailResponse struct {
 	Quantity    int64     `json:"quantity" form:"quantity"`
 	TotalPrice  int64     `json:"total_price" form:"total_price"`
 }
+
+type TransactionDetailRequest struct {
+	UserID uint `json:"user_id" form:"user_id"`
+}
