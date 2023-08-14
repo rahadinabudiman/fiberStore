@@ -11,6 +11,7 @@ import (
 
 type TransactionDetailHandler interface {
 	InsertOne(c *fiber.Ctx) error
+	FindLatestTransaction(c *fiber.Ctx) error
 }
 
 type transactionDetailHandler struct {
@@ -26,6 +27,7 @@ func NewTransactionDetailHandler(protected *fiber.Group, TransactionDetailUsecas
 
 	// Protected User Routes
 	protected.Post("/transaction", handler.InsertOne)
+	protected.Get("/transaction", handler.FindLatestTransaction)
 
 	return handler
 }
@@ -92,6 +94,50 @@ func (th *transactionDetailHandler) InsertOne(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(
 		dtos.NewResponse(
 			fiber.StatusCreated,
+			"success",
+			res,
+		),
+	)
+}
+
+func (th *transactionDetailHandler) FindLatestTransaction(c *fiber.Ctx) error {
+	token := middlewares.GetTokenFromHeader(c)
+	if token == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewResponseMessage(
+				fiber.StatusBadRequest,
+				"bad request",
+			),
+		)
+	}
+
+	userID, err := middlewares.GetUserIdFromToken(token)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusUnauthorized,
+				"unauthorized",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	ctx := c.Context()
+
+	res, err := th.TransactionDetailUsecase.FindAll(ctx, userID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusInternalServerError,
+				"internal server error",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(
+		dtos.NewResponse(
+			fiber.StatusOK,
 			"success",
 			res,
 		),
