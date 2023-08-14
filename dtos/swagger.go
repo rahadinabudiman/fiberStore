@@ -54,6 +54,24 @@ type GetAllProductStatusOKResponse struct {
 	Meta       utils.Meta        `json:"meta"`
 }
 
+// Cart
+type InsertCartStatusOKResponse struct {
+	StatusCode int              `json:"status_code" example:"200"`
+	Message    string           `json:"message" example:"Successfully insert cart"`
+	Data       AddProductToCart `json:"data"`
+}
+
+type CartStatusOKResponse struct {
+	StatusCode int                `json:"status_code" example:"200"`
+	Message    string             `json:"message" example:"Successfully get cart"`
+	Data       CartDetailResponse `json:"data"`
+}
+
+type CartDeletedStatusOKResponse struct {
+	StatusCode int    `json:"status_code" example:"200"`
+	Message    string `json:"message" example:"Successfully deleted cart"`
+}
+
 type StatusOKResponse struct {
 	StatusCode int         `json:"status_code" example:"200"`
 	Message    string      `json:"message" example:"Successfully"`

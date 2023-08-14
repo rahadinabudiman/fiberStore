@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  dtos.AddProductToCart:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
   dtos.BadRequestResponse:
     properties:
       errors: {}
@@ -8,6 +15,15 @@ definitions:
         type: string
       status_code:
         example: 400
+        type: integer
+    type: object
+  dtos.CartDeletedStatusOKResponse:
+    properties:
+      message:
+        example: Successfully deleted cart
+        type: string
+      status_code:
+        example: 200
         type: integer
     type: object
   dtos.DeleteUserRequest:
@@ -70,6 +86,17 @@ definitions:
       slug:
         type: string
       stock:
+        type: integer
+    type: object
+  dtos.InsertCartStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.AddProductToCart'
+      message:
+        example: Successfully insert cart
+        type: string
+      status_code:
+        example: 200
         type: integer
     type: object
   dtos.InsertProductStatusOKResponse:
@@ -308,7 +335,7 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: 54.179.176.114:1309
+host: localhost:8080
 info:
   contact:
     name: r4ha
@@ -397,12 +424,6 @@ paths:
         in: query
         name: id
         type: integer
-      - description: Payload Body [RAW]
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dtos.UpdateProductRequest'
       produces:
       - application/json
       responses:
@@ -539,6 +560,127 @@ paths:
       summary: Get all users
       tags:
       - Admin - User
+  /cart:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Product In Cart
+      parameters:
+      - description: Product number
+        in: query
+        name: product_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.CartDeletedStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Product In Cart
+      tags:
+      - User - Cart
+    get:
+      consumes:
+      - application/json
+      description: Get Product In Cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.InsertCartStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Product In Cart
+      tags:
+      - User - Cart
+    post:
+      consumes:
+      - application/json
+      description: Add Product To Cart
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.AddProductToCart'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.InsertCartStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add Product To Cart
+      tags:
+      - User - Cart
   /login:
     post:
       consumes:

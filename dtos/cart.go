@@ -14,6 +14,11 @@ type InsertCartDetailResponse struct {
 	Quantity    int64  `json:"quantity" form:"quantity"`
 }
 
+type AddProductToCart struct {
+	ProductID uint `json:"product_id" form:"product_id"`
+	Quantity  int  `json:"quantity" form:"quantity"`
+}
+
 type DetailCartDetailResponse struct {
 	ID          uint   `json:"id" form:"id"`
 	ProductName string `json:"product_name" form:"product_name"`
