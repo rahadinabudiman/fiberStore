@@ -26,7 +26,7 @@ func (ur *userRepository) InsertOne(req *models.User) (*models.User, error) {
 func (ur *userRepository) FindOneByUsername(username string) (*models.User, error) {
 	var user *models.User
 
-	err := ur.db.Model(&user).Where("username = ?", username).First(&user).Error
+	err := ur.db.Unscoped().Model(&user).Where("username = ?", username).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -46,14 +46,14 @@ func (ur *userRepository) FindOneAdmin(id uint) (*models.User, error) {
 }
 
 func (ur *userRepository) FindOneById(id int) (*models.User, error) {
-	var user *models.User
+	var user models.User
 
-	err := ur.db.Model(&user).Where("id = ?", id).First(&user).Error
+	err := ur.db.Unscoped().Where("id = ?", id).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	return &user, nil
 }
 
 func (ur *userRepository) FindAll(page, limit int, search string) (*[]models.User, int, error) {
@@ -67,7 +67,7 @@ func (ur *userRepository) FindAll(page, limit int, search string) (*[]models.Use
 
 	offset := (page - 1) * limit
 
-	err = ur.db.Unscoped().Where("role = 'Customer' AND (name LIKE ? OR username LIKE ?)", "%"+search+"%", "%"+search+"%").Order("id DESC").Limit(limit).Offset(offset).Find(&users).Error
+	err = ur.db.Unscoped().Where("role = 'Customer' AND (name LIKE ? OR username LIKE ?)", "%"+search+"%", "%"+search+"%").Order("name DESC").Limit(limit).Offset(offset).Find(&users).Error
 	if err != nil {
 		return nil, int(count), err
 	}
