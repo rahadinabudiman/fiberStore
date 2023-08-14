@@ -40,7 +40,7 @@ func NewUserHandler(api *fiber.Group, user *fiber.Group, admin *fiber.Group, Use
 	user.Delete("", handler.DeleteAccount)
 
 	// Protected Admin Routes
-	admin.Get("/user/findAll", handler.GetAllProfile)
+	admin.Get("/user", handler.GetAllProfile)
 	admin.Delete("/user", handler.DeleteAccount)
 
 	return handler

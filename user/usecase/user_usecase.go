@@ -7,6 +7,7 @@ import (
 	"fiberStore/helpers"
 	"fiberStore/middlewares"
 	"fiberStore/models"
+	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -29,6 +30,20 @@ func NewUserUsecase(UserRepository models.UserRepository, UserAmountRepository m
 	}
 }
 
+// UserLogin godoc
+// @Summary      Login User with Username and Password
+// @Description  Login an account
+// @Tags         User - Auth
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.UserLoginRequest true "Payload Body [RAW]"
+// @Success      200 {object} dtos.LoginStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /login [post]
 func (uu *userUsecase) LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.UserLoginRequest) (res *dtos.UserLoginResponse, err error) {
 	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
 	defer cancel()
@@ -37,6 +52,14 @@ func (uu *userUsecase) LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.Us
 	if err != nil {
 		return nil, errors.New("username not found")
 	}
+
+	if !user.DeletedAt.Time.IsZero() {
+		return nil, errors.New("account has been deleted")
+	}
+
+	fmt.Println(user)
+
+	fmt.Println(user.DeletedAt.Time.IsZero())
 
 	err = helpers.ComparePassword(req.Password, user.Password)
 	if err != nil {
@@ -57,6 +80,20 @@ func (uu *userUsecase) LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.Us
 	return res, nil
 }
 
+// UserLogin godoc
+// @Summary      Login User with Username and Password
+// @Description  Login an account
+// @Tags         User - Auth
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.UserRegister true "Payload Body [RAW]"
+// @Success      200 {object} dtos.RegisterStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /register [post]
 func (uu *userUsecase) InsertOne(ctx context.Context, req *dtos.UserRegister) (res *dtos.UserRegisterResponse, err error) {
 	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
 	defer cancel()
@@ -114,6 +151,20 @@ func (uu *userUsecase) InsertOne(ctx context.Context, req *dtos.UserRegister) (r
 	return res, nil
 }
 
+// GetProfile godoc
+// @Summary      Get Profile
+// @Description  User get profile
+// @Tags         User - Account
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} dtos.ProfileStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user [get]
+// @Security BearerAuth
 func (uu *userUsecase) FindOneById(ctx context.Context, id int) (res *dtos.UserProfileResponse, err error) {
 	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
 	defer cancel()
@@ -121,6 +172,10 @@ func (uu *userUsecase) FindOneById(ctx context.Context, id int) (res *dtos.UserP
 	Profile, err := uu.UserRepository.FindOneById(id)
 	if err != nil {
 		return nil, errors.New("user not found")
+	}
+
+	if !Profile.DeletedAt.Time.IsZero() {
+		return nil, errors.New("account has been deleted")
 	}
 
 	res = &dtos.UserProfileResponse{
@@ -131,6 +186,24 @@ func (uu *userUsecase) FindOneById(ctx context.Context, id int) (res *dtos.UserP
 	return res, nil
 }
 
+// GetAllUsers godoc
+// @Summary      Get all users
+// @Description  Get all users
+// @Tags         Admin - User
+// @Accept       json
+// @Produce      json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Param search query string false "Search data"
+// @Param sortBy query string false "Sort by name" Enums(asc, desc)
+// @Success      200 {object} dtos.GetAllUserStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/user [get]
+// @Security BearerAuth
 func (uu *userUsecase) FindAll(ctx context.Context, page, limit int, search, sortBy string) (res *[]dtos.UserDetailResponse, count int, err error) {
 	var userResponses []dtos.UserDetailResponse
 
@@ -143,10 +216,16 @@ func (uu *userUsecase) FindAll(ctx context.Context, page, limit int, search, sor
 	}
 
 	for _, user := range *users {
+		Status := "Active"
+		if !user.DeletedAt.Time.IsZero() {
+			Status = "Deleted"
+		}
+
 		userResponse := dtos.UserDetailResponse{
 			ID:       user.ID,
 			Name:     user.Name,
 			Username: user.Username,
+			Status:   Status,
 		}
 		userResponses = append(userResponses, userResponse)
 	}
@@ -166,6 +245,21 @@ func (uu *userUsecase) FindAll(ctx context.Context, page, limit int, search, sor
 	return res, count, nil
 }
 
+// UserUpdateProfile godoc
+// @Summary      Update Profile
+// @Description  User update an Profile
+// @Tags         User - Account
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.UserUpdateProfile true "Payload Body [RAW]"
+// @Success      200 {object} dtos.ProfileStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user [put]
+// @Security BearerAuth
 func (uu *userUsecase) UpdateOne(ctx context.Context, id int, req *dtos.UserUpdateProfile) (res *dtos.UserProfileResponse, err error) {
 	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
 	defer cancel()
@@ -198,6 +292,21 @@ func (uu *userUsecase) UpdateOne(ctx context.Context, id int, req *dtos.UserUpda
 	return res, nil
 }
 
+// UserDeleteProfile godoc
+// @Summary      Delete Profile
+// @Description  User delete an Profile
+// @Tags         User - Account
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.DeleteUserRequest true "Payload Body [RAW]"
+// @Success      200 {object} dtos.StatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user [delete]
+// @Security BearerAuth
 func (uu *userUsecase) DeleteOne(ctx context.Context, id uint, req dtos.DeleteUserRequest) error {
 	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
 	defer cancel()

@@ -10,6 +10,7 @@
 - View cart: Customers can see a list of products that have been added to the shopping cart.
 - Remove from cart: Customers can delete products from the shopping cart.
 - Checkout and Payment: Customers can proceed to checkout and make payment TransactionDetails.
+- Latest Transactions: Customers can view a list of their latest transactions.
 - User Authentication: Customers can create accounts, log in, and manage their profiles.
 
 ## Technologies Used
