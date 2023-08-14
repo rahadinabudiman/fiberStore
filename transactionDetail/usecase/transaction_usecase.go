@@ -111,6 +111,7 @@ func (tu *TransactionDetailUsecase) InsertOne(ctx context.Context, req *models.T
 			UserID:        req.UserID,
 			CartID:        cart.ID,
 			ProductID:     detail.ProductID,
+			Price:         product.Price,
 			Quantity:      detail.Quantity,
 			TotalPrice:    int64(totalPricePerProduct),
 		}
@@ -184,7 +185,7 @@ func (tu *TransactionDetailUsecase) FindOne(ctx context.Context, id uint) (*mode
 	return nil, nil
 }
 
-func (tu *TransactionDetailUsecase) FindAll(ctx context.Context, userID uint) (*[]models.TransactionDetail, error) {
+func (tu *TransactionDetailUsecase) FindAll(ctx context.Context, userID uint) (*[]dtos.DetailTransactionDetailResponse, error) {
 	_, cancel := context.WithTimeout(ctx, tu.contextTimeout)
 	defer cancel()
 
@@ -196,12 +197,35 @@ func (tu *TransactionDetailUsecase) FindAll(ctx context.Context, userID uint) (*
 		}
 	}()
 
-	// // Mencari data transaksi
-	// TransactionDetails, err := tu.TransactionDetailRepository.FindAll(userID)
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return nil, errors.New("TransactionDetail not found")
-	// }
+	// Mencari data user
+	user, err := tu.UserRepository.FindOneById(int(userID))
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
 
-	return nil, nil
+	transactionDetail, err := tu.TransactionDetailRepository.FindAll(user.ID)
+	if err != nil {
+		return nil, errors.New("transaction detail not found")
+	}
+
+	var detailTransactionDetailResponses []dtos.DetailTransactionDetailResponse
+	for _, detail := range *transactionDetail {
+		product, err := tu.ProductRepository.FindOne(int(detail.ProductID))
+		if err != nil {
+			return nil, errors.New("product not found")
+		}
+
+		detailTransactionDetailResponse := dtos.DetailTransactionDetailResponse{
+			ID:          detail.ID,
+			CreatedAt:   detail.CreatedAt,
+			ProductName: product.Name,
+			Price:       detail.Price,
+			Quantity:    detail.Quantity,
+			TotalPrice:  detail.TotalPrice,
+		}
+
+		detailTransactionDetailResponses = append(detailTransactionDetailResponses, detailTransactionDetailResponse)
+	}
+
+	return &detailTransactionDetailResponses, nil
 }
