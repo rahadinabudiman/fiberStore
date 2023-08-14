@@ -134,15 +134,15 @@ func (cu *CartDetailUsecase) FindAll(ctx context.Context, userID uint) (*dtos.Ca
 				return nil, errors.New("product not found")
 			}
 
-			totalPrice := int(product.Price) * CartDetail.Quantity
-			grandTotal += totalPrice
+			totalPrice := product.Price * CartDetail.Quantity
+			grandTotal += int(totalPrice)
 
 			CartDetailResponse := dtos.DetailCartDetailResponse{
 				ID:          product.ID,
 				ProductName: product.Name,
-				Price:       int(product.Price),
+				Price:       product.Price,
 				Quantity:    CartDetail.Quantity,
-				TotalPrice:  int(product.Price) * CartDetail.Quantity,
+				TotalPrice:  product.Price * CartDetail.Quantity,
 			}
 			detailCartDetailResponses = append(detailCartDetailResponses, CartDetailResponse)
 		}
