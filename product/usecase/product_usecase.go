@@ -330,7 +330,6 @@ func (pu *productUsecase) UpdateOne(ctx context.Context, req *dtos.UpdateProduct
 // @Accept       json
 // @Produce      json
 // @Param id query int false "Product ID"
-// @Param        request body dtos.UpdateProductRequest true "Payload Body [RAW]"
 // @Success      200 {object} dtos.ProductDeletedStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
