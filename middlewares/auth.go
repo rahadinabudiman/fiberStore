@@ -38,12 +38,16 @@ func CreateToken(userID uint, role string) (string, error) {
 func GetTokenFromHeader(c *fiber.Ctx) string {
 	authHeader := c.Get("Authorization")
 	if authHeader != "" {
-		// The header value should be in the format "Bearer <token>"
-		splitHeader := strings.Split(authHeader, " ")
-		if len(splitHeader) == 2 {
-			return splitHeader[1]
+		// If the header has "Bearer", split and get the token
+		if strings.Contains(authHeader, "Bearer") {
+			splitHeader := strings.Split(authHeader, " ")
+			if len(splitHeader) == 2 {
+				return splitHeader[1]
+			}
+		} else {
+			// If it doesn't have "Bearer", return the whole header value as the token
+			return authHeader
 		}
-		return ""
 	}
 	return ""
 }

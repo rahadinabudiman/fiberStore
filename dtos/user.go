@@ -35,8 +35,8 @@ type TopUpSaldoResponse struct {
 }
 
 type UserLoginResponse struct {
-	Username string `json:"username" form:"username" binding:"required"`
-	Token    string `json:"token" form:"token" binding:"required"`
+	Username string `json:"username" form:"username" binding:"required" example:"rahadinabudimansundara"`
+	Token    string `json:"token" form:"token" binding:"required" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"`
 }
 
 type UserRegisterResponse struct {
@@ -55,4 +55,5 @@ type UserDetailResponse struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Username string `json:"username"`
+	Status   string `json:"status"`
 }

@@ -24,19 +24,49 @@ import (
 	"os"
 	"time"
 
+	_ "fiberStore/docs"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/swagger"
 	"github.com/joho/godotenv"
 )
 
+// @title           FiberStore Documentation API
+// @version         1.0
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   r4ha
+// @contact.url    https://github.com/rahadinabudiman
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// 54.179.176.114:1309/api/v1/swagger/index.html
+// 54.179.176.114:1309
+
+// @host      54.179.176.114:1309
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	// Setup Fiber
 	app := fiber.New()
 	app.Use(recover.New())
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowHeaders:     "Origin, Content-Type, Accept, Content-Length, Accept-Language, Accept-Encoding, Connection, Access-Control-Allow-Origin",
+		AllowOrigins:     "*",
+		AllowCredentials: true,
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
+	}))
 	// Initialize default config for logger middleware
 	app.Use(logger.New())
 	app.Use(encryptcookie.New(encryptcookie.Config{
@@ -112,6 +142,8 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
+
+	api.Get("/swagger/*", swagger.HandlerDefault)
 
 	appPort := fmt.Sprintf(":%s", os.Getenv("SERVER_ADDRESS"))
 	log.Fatal(app.Listen(appPort))
