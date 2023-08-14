@@ -17,6 +17,7 @@ type TransactionDetail struct {
 	Cart          Cart        `gorm:"foreignKey:CartID" json:"-"`
 	ProductID     uint        `json:"product_id" form:"product_id"`
 	Product       Product     `gorm:"foreignKey:ProductID" json:"-"`
+	Price         int64       `json:"price" form:"price"`
 	Quantity      int64       `json:"quantity" form:"quantity"`
 	TotalPrice    int64       `json:"total_price" form:"total_price"`
 }
@@ -33,5 +34,5 @@ type TransactionDetailRepository interface {
 type TransactionDetailUsecase interface {
 	InsertOne(ctx context.Context, req *TransactionDetail) (*dtos.InsertTransactionDetailResponse, error)
 	FindOne(ctx context.Context, cartID uint) (*TransactionDetail, error)
-	FindAll(ctx context.Context, userID uint) (*[]TransactionDetail, error)
+	FindAll(ctx context.Context, userID uint) (*[]dtos.DetailTransactionDetailResponse, error)
 }
