@@ -1804,7 +1804,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "54.179.176.114:1309",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "FiberStore Documentation API",
