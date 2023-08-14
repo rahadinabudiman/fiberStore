@@ -45,10 +45,10 @@ import (
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
-// 54.179.176.114:1309/api/v1/swagger/index.html
-// 54.179.176.114:1309
+// localhost:8080/api/v1/swagger/index.html
+// localhost:8080
 
-// @host      54.179.176.114:1309
+// @host      localhost:8080
 // @BasePath  /api/v1
 
 // @securityDefinitions.apikey BearerAuth
@@ -62,10 +62,10 @@ func main() {
 	app := fiber.New()
 	app.Use(recover.New())
 	app.Use(cors.New(cors.Config{
-		AllowHeaders:     "Origin, Content-Type, Accept, Content-Length, Accept-Language, Accept-Encoding, Connection, Access-Control-Allow-Origin",
+		AllowHeaders:     "Origin, Content-Type, Accept, Content-Length, Accept-Language, Accept-Encoding, Connection, Authorization",
+		AllowMethods:     "GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS",
 		AllowOrigins:     "*",
 		AllowCredentials: true,
-		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
 	}))
 	// Initialize default config for logger middleware
 	app.Use(logger.New())

@@ -4,7 +4,6 @@ import (
 	"fiberStore/dtos"
 	"fiberStore/middlewares"
 	"fiberStore/models"
-	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -30,7 +29,7 @@ func NewCartDetailHandler(protected *fiber.Group, CartDetailUsecase models.CartD
 	// Protected User Routes
 	protected.Post("/cart", handler.InsertOne)
 	protected.Get("/cart", handler.GetCartDetail)
-	protected.Delete("/cart/:product_id", handler.DeleteProduct)
+	protected.Delete("/cart", handler.DeleteProduct)
 
 	return handler
 }
@@ -169,16 +168,7 @@ func (ch *cartDetailHandler) DeleteProduct(c *fiber.Ctx) error {
 		)
 	}
 
-	productID, err := strconv.Atoi(c.Params("product_id"))
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(
-			dtos.NewErrorResponse(
-				fiber.StatusBadRequest,
-				"error converting product id",
-				dtos.GetErrorData(err),
-			),
-		)
-	}
+	productID := c.QueryInt("product_id")
 
 	ctx := c.Context()
 

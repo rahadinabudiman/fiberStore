@@ -26,6 +26,21 @@ func NewCartDetailUsecase(CartDetailRepository models.CartDetailRepository, Cart
 	}
 }
 
+// AddProductToCart godoc
+// @Summary      Add Product To Cart
+// @Description  Add Product To Cart
+// @Tags         User - Cart
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.AddProductToCart true "Payload Body [RAW]"
+// @Success      200 {object} dtos.InsertCartStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /cart [post]
+// @Security BearerAuth
 func (cu *CartDetailUsecase) InsertOne(ctx context.Context, req *dtos.InsertCartDetailRequest) (*dtos.InsertCartDetailResponse, error) {
 	_, cancel := context.WithTimeout(ctx, cu.contextTimeout)
 	defer cancel()
@@ -111,6 +126,20 @@ func (cu *CartDetailUsecase) InsertOne(ctx context.Context, req *dtos.InsertCart
 	}
 }
 
+// GetProductInCart godoc
+// @Summary      Get Product In Cart
+// @Description  Get Product In Cart
+// @Tags         User - Cart
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} dtos.InsertCartStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /cart [get]
+// @Security BearerAuth
 func (cu *CartDetailUsecase) FindAll(ctx context.Context, userID uint) (*dtos.CartDetailResponse, error) {
 	var detailCartDetailResponses []dtos.DetailCartDetailResponse
 
@@ -155,6 +184,21 @@ func (cu *CartDetailUsecase) FindAll(ctx context.Context, userID uint) (*dtos.Ca
 	}
 }
 
+// DeleteProductInCart godoc
+// @Summary      Delete Product In Cart
+// @Description  Delete Product In Cart
+// @Tags         User - Cart
+// @Accept       json
+// @Produce      json
+// @Param product_id query int false "Product number"
+// @Success      200 {object} dtos.CartDeletedStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /cart [delete]
+// @Security BearerAuth
 func (cu *CartDetailUsecase) DeleteProduct(ctx context.Context, userID uint, productID uint) error {
 	_, cancel := context.WithTimeout(ctx, cu.contextTimeout)
 	defer cancel()
