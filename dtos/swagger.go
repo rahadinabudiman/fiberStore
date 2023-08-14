@@ -72,6 +72,19 @@ type CartDeletedStatusOKResponse struct {
 	Message    string `json:"message" example:"Successfully deleted cart"`
 }
 
+// Transaction
+type InsertTransactionStatusOKResponse struct {
+	StatusCode int                             `json:"status_code" example:"200"`
+	Message    string                          `json:"message" example:"Successfully insert transaction"`
+	Data       InsertTransactionDetailResponse `json:"data"`
+}
+
+type TransactionStatusOKResponse struct {
+	StatusCode int                             `json:"status_code" example:"200"`
+	Message    string                          `json:"message" example:"Successfully get transaction"`
+	Data       DetailTransactionDetailResponse `json:"data"`
+}
+
 type StatusOKResponse struct {
 	StatusCode int         `json:"status_code" example:"200"`
 	Message    string      `json:"message" example:"Successfully"`

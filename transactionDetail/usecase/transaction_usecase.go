@@ -32,6 +32,21 @@ func NewTransactionDetailUsecase(TransactionDetailRepository models.TransactionD
 	}
 }
 
+// Checkout Cart godoc
+// @Summary      Chackout Cart
+// @Description  Chackout Cart
+// @Tags         User - Transaction
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.TransactionDetailRequest true "Payload Body [RAW]"
+// @Success      200 {object} dtos.InsertTransactionStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /transaction [post]
+// @Security BearerAuth
 func (tu *TransactionDetailUsecase) InsertOne(ctx context.Context, req *models.TransactionDetail) (*dtos.InsertTransactionDetailResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, tu.contextTimeout)
 	defer cancel()
@@ -185,6 +200,20 @@ func (tu *TransactionDetailUsecase) FindOne(ctx context.Context, id uint) (*mode
 	return nil, nil
 }
 
+// GetLatestTransaction godoc
+// @Summary      Get Latest Transaction
+// @Description  Get Latest Transaction
+// @Tags         User - Transaction
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} dtos.TransactionStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /transaction [get]
+// @Security BearerAuth
 func (tu *TransactionDetailUsecase) FindAll(ctx context.Context, userID uint) (*[]dtos.DetailTransactionDetailResponse, error) {
 	_, cancel := context.WithTimeout(ctx, tu.contextTimeout)
 	defer cancel()
