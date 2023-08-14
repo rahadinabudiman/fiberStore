@@ -58,3 +58,10 @@ type ProductResponse struct {
 	Category string `json:"category"`
 	Image    string `json:"image"`
 }
+
+type ProductTransactionResponse struct {
+	Name       string `json:"name"`
+	Price      int64  `json:"price"`
+	Quantity   int64  `json:"quantity"`
+	TotalPrice int64  `json:"total_price"`
+}
