@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fiberStore/dtos"
 	"fiberStore/models"
-	"fmt"
 	"time"
 )
 
@@ -94,7 +93,6 @@ func (tu *TransactionDetailUsecase) InsertOne(ctx context.Context, req *models.T
 	}
 
 	// Menghitung total harga dari cart details dan membuat transaksi detail
-	var insertedTransactionDetails []*models.TransactionDetail
 	var ProductResponse []dtos.ProductTransactionResponse
 	for _, detail := range *cartDetails {
 		product, err := tu.ProductRepository.FindOne(int(detail.ProductID))
@@ -117,13 +115,12 @@ func (tu *TransactionDetailUsecase) InsertOne(ctx context.Context, req *models.T
 			TotalPrice:    int64(totalPricePerProduct),
 		}
 
-		insertedDetail, err := tu.TransactionDetailRepository.InsertOne(newTransactionDetail)
+		_, err = tu.TransactionDetailRepository.InsertOne(newTransactionDetail)
 		if err != nil {
 			tx.Rollback()
 			return nil, errors.New("failed to create TransactionDetail")
 		}
 
-		insertedTransactionDetails = append(insertedTransactionDetails, insertedDetail)
 		ProductResponse = append(ProductResponse, dtos.ProductTransactionResponse{
 			Name:       product.Name,
 			Price:      product.Price,
@@ -179,9 +176,6 @@ func (tu *TransactionDetailUsecase) InsertOne(ctx context.Context, req *models.T
 		Produk:        ProductResponse,
 		TotalPrice:    totalPrice,
 	}
-
-	awasdwad := insertedTransactionDetails
-	fmt.Println(awasdwad)
 
 	return res, nil
 }
