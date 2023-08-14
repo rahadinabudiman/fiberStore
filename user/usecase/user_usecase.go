@@ -33,7 +33,7 @@ func NewUserUsecase(UserRepository models.UserRepository, UserAmountRepository m
 // UserLogin godoc
 // @Summary      Login User with Username and Password
 // @Description  Login an account
-// @Tags         User - Auth
+// @Tags         Authentikasi
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.UserLoginRequest true "Payload Body [RAW]"
@@ -80,10 +80,10 @@ func (uu *userUsecase) LoginUser(ctx context.Context, c *fiber.Ctx, req *dtos.Us
 	return res, nil
 }
 
-// UserLogin godoc
-// @Summary      Login User with Username and Password
-// @Description  Login an account
-// @Tags         User - Auth
+// RegisterLogin godoc
+// @Summary      Register User with Username and Password
+// @Description  Register an account
+// @Tags         Authentikasi
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.UserRegister true "Payload Body [RAW]"
