@@ -2,6 +2,10 @@
 
 **fiberStore** is a simple online store application developed using the Go programming language and the Fiber web framework. This application allows users to browse products, add them to their cart, and view their cart's contents.
 
+## ERD fiberStore
+
+![ERD fiberStore](https://i.imgur.com/HAptHQi.png)
+
 ## Features
 
 - Browse Products: Users can view a list of available products with their details.
@@ -26,31 +30,51 @@
 
 ## Installation
 
+NOTE : if you running on local machine, don't forget to create MySQL Database which name is fiberstore. After successfully running, table will auto migration.
+
+1. Clone this repository using git to your local machine
+
 ```
 git clone https://github.com/rahadinabudiman/fiberStore.git
 ```
+
+2. go to folder fiberStore
 
 ```
 cd fiberStore
 ```
 
-1. Install the required dependencies using Go:
+3. Install the required dependencies using Go:
 
 ```
 go get
 ```
 
-2. Rename .env.example file:
+4. Rename .env.example file:
 
 ```
 cp .env.example .env
 ```
 
-3. Open the .env file using a text editor and configure the necessary environment variables, such as database connection settings and Cloudinary credentials.
-4. Build and run the application:
+5. Open the .env file using a text editor and configure the necessary environment variables, such as database connection settings and Cloudinary credentials.
+6. Build and run the application:
 
 ```
 go run main.go
+```
+
+## Installation With Docker
+
+1. Pull image repsitory to your local machine
+
+```
+docker pull kmoonkinan/fiberstore:latest
+```
+
+2. Run Project with docker-compose
+
+```
+docker-compose up
 ```
 
 ## Usage
@@ -58,6 +82,14 @@ go run main.go
 1. Open your web browser or Postman and navigate to http://localhost:{PORT} to access the fiberStore application.
 2. Browse through the available products, add them to your cart, view your cart's contents, manage your cart, and proceed to checkout.
 3. Use the authentication features to register and log in as a customer.
+
+## API Documentation
+
+After running project in local machine, you can access `/api/v1/swagger/index.html` or you can access to deployed link : [Deployed Link By AWS](http://54.179.176.114:1309/api/v1/swagger/index.html)
+
+## Usage with Postman
+
+You can also test using Postman provided in the `.postman_collection` and `.postman_environment` files to facilitate testing.
 
 ## Demo
 
@@ -74,3 +106,14 @@ password: fiberstore
 username: admin
 password: fiberstore
 ```
+
+## Open Endpoints
+
+Open endpoints require no Authentication.
+
+- Login : `POST /api/v1/login`
+- Register : `POST /api/v1/register`
+- Get Product By Id : `POST /api/v1/product/findById?id=1`
+- Get All Product : `POST /api/v1/product?page=1&limit=10`
+- Get All Product By Name : `POST /api/v1/product/findByName?name=adeuy&page=1&limit=2`
+- Get All Product By Category : `POST /api/v1/product/findByCategory?category=DanGdut&page=1&limit=10`
