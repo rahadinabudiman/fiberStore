@@ -1,0 +1,772 @@
+{
+	"info": {
+		"_postman_id": "8c427b1f-9a5f-4afb-9ed0-8bc27a57eaf1",
+		"name": "fiberStore",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28432925"
+	},
+	"item": [
+		{
+			"name": "Authentikasi",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Rahadina Budiman Sundara\",\r\n    \"Username\":\"wasdwasd\",\r\n    \"password\":\"wasdwasd\",\r\n    \"confirm_password\":\"wasdwasd\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/register",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"admin\",\r\n    \"password\":\"fiberstore\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/login",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Public",
+			"item": [
+				{
+					"name": "Product",
+					"item": [
+						{
+							"name": "Get Product By ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}/product/findById?id=1",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"product",
+										"findById"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Product",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}/product?page=1&limit=10",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"product"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Product Query",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}/product/findByName?name=adeuy&page=1&limit=2",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"product",
+										"findByName"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "adeuy"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Product Category",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}/product/findByCategory?category=DanGdut&page=1&limit=10",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"product",
+										"findByCategory"
+									],
+									"query": [
+										{
+											"key": "category",
+											"value": "DanGdut"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Customer",
+					"item": [
+						{
+							"name": "Get Profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIwODYxMjEsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.MZxiaW_rM_CzbmI_mF8KWTdRrmv31bougJsfbvzbFdw",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}/user",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTE3NTE2MTAsInJvbGUiOiJDdXN0b21lciIsInVzZXJJRCI6NH0.kzQZT-jddDDF4fTPqXhIAg6QLKCd7-6DaRykyZSFk28",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"asd\",\r\n    \"username\":\"asda\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{local}}/user/3",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"user",
+										"3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTE4MzgzODksInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MTN9.2JyzRvGOS-zs_cA23yjvR9lPS4wEyUi6AGYW4kOuS5A",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\":\"wasdwasd\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{local}}/user",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "User",
+							"item": [
+								{
+									"name": "Get All Profile",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIwODYxMjEsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.MZxiaW_rM_CzbmI_mF8KWTdRrmv31bougJsfbvzbFdw",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}/admin/user?page=1&limit=10&search=&sortBy=desc",
+											"host": [
+												"{{local}}"
+											],
+											"path": [
+												"admin",
+												"user"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "limit",
+													"value": "10"
+												},
+												{
+													"key": "search",
+													"value": ""
+												},
+												{
+													"key": "sortBy",
+													"value": "desc"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Account Admin",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTE4NDI1MjMsInJvbGUiOiJDdXN0b21lciIsInVzZXJJRCI6MX0.8vKOPP5-VQZY6JZhqc6uo41QRWSWILU-Mxz6PY1alfw",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"password\":\"wasdwasd\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{local}}/admin/user",
+											"host": [
+												"{{local}}"
+											],
+											"path": [
+												"admin",
+												"user"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Top Up Balance",
+							"item": [
+								{
+									"name": "Top Up Balance",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIwMDgzMjIsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.sn13xynu00updqdatNmaj1wx0B_BLkI2YyXcUMeAi50",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\":\"admin\",\r\n    \"amount\":1000000\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{local}}/admin/topup",
+											"host": [
+												"{{local}}"
+											],
+											"path": [
+												"admin",
+												"topup"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Product",
+							"item": [
+								{
+									"name": "Add Product",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIwODYxMjEsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.MZxiaW_rM_CzbmI_mF8KWTdRrmv31bougJsfbvzbFdw",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "name",
+													"value": "adeuy",
+													"type": "text"
+												},
+												{
+													"key": "detail",
+													"value": "Dangdut",
+													"type": "text"
+												},
+												{
+													"key": "price",
+													"value": "100000",
+													"type": "text"
+												},
+												{
+													"key": "stock",
+													"value": "2",
+													"type": "text"
+												},
+												{
+													"key": "category",
+													"value": "Dangdut",
+													"type": "text"
+												},
+												{
+													"key": "image",
+													"type": "file",
+													"src": "/C:/Users/erbee/Downloads/WhatsApp Image 2023-08-13 at 23.43.10.jpeg"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{local}}/admin/product",
+											"host": [
+												"{{local}}"
+											],
+											"path": [
+												"admin",
+												"product"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Product",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIwMDgzMjIsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.sn13xynu00updqdatNmaj1wx0B_BLkI2YyXcUMeAi50",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "name",
+													"value": "mengapa semua ini terjadi padaku",
+													"type": "text"
+												},
+												{
+													"key": "detail",
+													"value": "Ini apa",
+													"type": "text"
+												},
+												{
+													"key": "price",
+													"value": "10000",
+													"type": "text"
+												},
+												{
+													"key": "stock",
+													"value": "2",
+													"type": "text"
+												},
+												{
+													"key": "category",
+													"value": "Tebak hayo",
+													"type": "text"
+												},
+												{
+													"key": "image",
+													"type": "file",
+													"src": []
+												}
+											]
+										},
+										"url": {
+											"raw": "{{local}}/admin/product/1",
+											"host": [
+												"{{local}}"
+											],
+											"path": [
+												"admin",
+												"product",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Product",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIxMDYxOTQsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.fxQv0taSOBQn6s76H9TlIOc8VR3pY_pcKKcwdesIXVU",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{deploy}}/admin/product/3",
+											"host": [
+												"{{deploy}}"
+											],
+											"path": [
+												"admin",
+												"product",
+												"3"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Transaction",
+					"item": [
+						{
+							"name": "Cart",
+							"item": [
+								{
+									"name": "Add Product to Cart",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIxMjEwOTUsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.3bvT2aBe4twwNopAR3La2nvt80QDNNFZkf6jv3lo4nU",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"product_id\":1,\r\n    \"quantity\":2\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{local}}/cart",
+											"host": [
+												"{{local}}"
+											],
+											"path": [
+												"cart"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Cart User",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIwNzIyNjUsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.LX44jcuj6Xwa1btlxFgLoKHKwyV80gN1N8dfbwYn8uA",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}/cart",
+											"host": [
+												"{{local}}"
+											],
+											"path": [
+												"cart"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Product in Cart",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIxMDYxOTQsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.fxQv0taSOBQn6s76H9TlIOc8VR3pY_pcKKcwdesIXVU",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{local}}/cart?product_id=1",
+											"host": [
+												"{{local}}"
+											],
+											"path": [
+												"cart"
+											],
+											"query": [
+												{
+													"key": "product_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Checkout",
+							"item": [
+								{
+									"name": "Checkout",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIxMjEwOTUsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.3bvT2aBe4twwNopAR3La2nvt80QDNNFZkf6jv3lo4nU",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"user_id\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{local}}/transaction",
+											"host": [
+												"{{local}}"
+											],
+											"path": [
+												"transaction"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Get Latest Transaction",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTIwODYxMjEsInJvbGUiOiJBZG1pbiIsInVzZXJJRCI6MX0.MZxiaW_rM_CzbmI_mF8KWTdRrmv31bougJsfbvzbFdw",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}/transaction",
+									"host": [
+										"{{local}}"
+									],
+									"path": [
+										"transaction"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

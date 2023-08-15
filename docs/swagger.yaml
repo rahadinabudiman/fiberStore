@@ -262,6 +262,34 @@ definitions:
         example: 200
         type: integer
     type: object
+  dtos.TopUpSaldoRequest:
+    properties:
+      amount:
+        example: 100000
+        type: number
+      username:
+        type: string
+    required:
+    - amount
+    type: object
+  dtos.TopUpSaldoResponse:
+    properties:
+      amount:
+        type: number
+      name:
+        type: string
+    type: object
+  dtos.TopUpStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.TopUpSaldoResponse'
+      message:
+        example: Successfully top up
+        type: string
+      status_code:
+        example: 200
+        type: integer
+    type: object
   dtos.TransactionDetailRequest:
     properties:
       user_id:
@@ -569,6 +597,50 @@ paths:
       summary: Update Product
       tags:
       - Admin - Product
+  /admin/topup:
+    post:
+      consumes:
+      - application/json
+      description: Top Up Saldo User With Username
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.TopUpSaldoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.TopUpStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Top Up Saldo User With Username
+      tags:
+      - Admin - Balance
   /admin/user:
     get:
       consumes:

@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-    image: fiberstore
+    image: kmoonkinan/fiberstore
     container_name: fiberstore
     ports:
       - "1309:1309"

@@ -85,6 +85,13 @@ type TransactionStatusOKResponse struct {
 	Data       DetailTransactionDetailResponse `json:"data"`
 }
 
+// Top Up Saldo
+type TopUpStatusOKResponse struct {
+	StatusCode int                `json:"status_code" example:"200"`
+	Message    string             `json:"message" example:"Successfully top up"`
+	Data       TopUpSaldoResponse `json:"data"`
+}
+
 type StatusOKResponse struct {
 	StatusCode int         `json:"status_code" example:"200"`
 	Message    string      `json:"message" example:"Successfully"`
