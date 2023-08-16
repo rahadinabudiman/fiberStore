@@ -403,6 +403,19 @@ definitions:
       username:
         type: string
     type: object
+  dtos.UserUpdatePassword:
+    properties:
+      confirm_new_password:
+        type: string
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - confirm_new_password
+    - new_password
+    - old_password
+    type: object
   dtos.UserUpdateProfile:
     properties:
       name:
@@ -1244,6 +1257,50 @@ paths:
       security:
       - BearerAuth: []
       summary: Update Profile
+      tags:
+      - User - Account
+  /user/password:
+    put:
+      consumes:
+      - application/json
+      description: User change PAssword
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UserUpdatePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ProfileStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Change Password
       tags:
       - User - Account
 securityDefinitions:
