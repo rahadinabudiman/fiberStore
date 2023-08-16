@@ -15,6 +15,12 @@ type UserUpdateProfile struct {
 	Username string `json:"username" form:"username" binding:"required"`
 }
 
+type UserUpdatePassword struct {
+	OldPassword        string `json:"old_password" form:"old_password" binding:"required"`
+	NewPassword        string `json:"new_password" form:"new_password" binding:"required"`
+	ConfirmNewPassword string `json:"confirm_new_password" form:"confirm_new_password" binding:"required"`
+}
+
 type DeleteUserRequest struct {
 	Password string `json:"password" form:"password" validate:"gte=6" example:"rahadinabudimansundara"`
 }
