@@ -17,6 +17,7 @@ type UserHandler interface {
 	GetProfile(c *fiber.Ctx) error
 	GetAllProfile(c *fiber.Ctx) error
 	UpdateProfile(c *fiber.Ctx) error
+	UpdateProfilePassword(c *fiber.Ctx) error
 	DeleteAccount(c *fiber.Ctx) error
 }
 
@@ -37,6 +38,7 @@ func NewUserHandler(api *fiber.Group, user *fiber.Group, admin *fiber.Group, Use
 	// Protected User Routes
 	user.Get("", handler.GetProfile)
 	user.Put("", handler.UpdateProfile)
+	user.Put("/password", handler.UpdateProfilePassword)
 	user.Delete("", handler.DeleteAccount)
 
 	// Protected Admin Routes
@@ -317,6 +319,72 @@ func (user *userHandler) UpdateProfile(c *fiber.Ctx) error {
 		dtos.NewResponse(
 			fiber.StatusOK,
 			"success updating user profile",
+			result,
+		),
+	)
+}
+
+func (user *userHandler) UpdateProfilePassword(c *fiber.Ctx) error {
+	token := middlewares.GetTokenFromHeader(c)
+	if token == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewResponseMessage(
+				fiber.StatusBadRequest,
+				"error getting token from header",
+			),
+		)
+	}
+
+	userID, err := middlewares.GetUserIdFromToken(token)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error getting user id from token",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	var req dtos.UserUpdatePassword
+
+	if err = c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error parsing request body",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	if err = user.validator.Struct(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error validating request body",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	ctx := c.Context()
+
+	result, err := user.UserUsecase.UpdatePassword(ctx, uint(userID), &req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			dtos.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"error updating user profile password",
+				dtos.GetErrorData(err),
+			),
+		)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(
+		dtos.NewResponse(
+			fiber.StatusOK,
+			"success updating password",
 			result,
 		),
 	)

@@ -35,5 +35,6 @@ type UserUsecase interface {
 	FindOneById(ctx context.Context, id int) (res *dtos.UserProfileResponse, err error)
 	FindAll(ctx context.Context, page, limit int, search, sortBy string) (*[]dtos.UserDetailResponse, int, error)
 	UpdateOne(ctx context.Context, id int, req *dtos.UserUpdateProfile) (res *dtos.UserProfileResponse, err error)
+	UpdatePassword(ctx context.Context, id uint, req *dtos.UserUpdatePassword) (res *dtos.UserProfileResponse, err error)
 	DeleteOne(ctx context.Context, id uint, req dtos.DeleteUserRequest) error
 }

@@ -292,6 +292,67 @@ func (uu *userUsecase) UpdateOne(ctx context.Context, id int, req *dtos.UserUpda
 	return res, nil
 }
 
+// USerChangePassword godoc
+// @Summary      Change Password
+// @Description  User change PAssword
+// @Tags         User - Account
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.UserUpdatePassword true "Payload Body [RAW]"
+// @Success      200 {object} dtos.ProfileStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user/password [put]
+// @Security BearerAuth
+func (uu *userUsecase) UpdatePassword(ctx context.Context, id uint, req *dtos.UserUpdatePassword) (res *dtos.UserProfileResponse, err error) {
+	_, cancel := context.WithTimeout(ctx, uu.contextTimeout)
+	defer cancel()
+
+	user, err := uu.UserRepository.FindOneById(int(id))
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	if req.OldPassword == "" || req.NewPassword == "" || req.ConfirmNewPassword == "" {
+		return nil, errors.New("password cannot be empty")
+	}
+
+	if len(req.NewPassword) < 6 {
+		return nil, errors.New("password must be at least 6 characters")
+	}
+
+	if req.NewPassword != req.ConfirmNewPassword {
+		return nil, errors.New("password and confirm password not match")
+	}
+
+	err = helpers.ComparePassword(req.OldPassword, user.Password)
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		return nil, errors.New("old password is incorrect")
+	}
+
+	passwordHash, err := helpers.HashPassword(req.NewPassword)
+	if err != nil {
+		return nil, errors.New("error hashing password")
+	}
+
+	user.Password = passwordHash
+
+	user, err = uu.UserRepository.UpdateOne(user)
+	if err != nil {
+		return nil, errors.New("error updating user")
+	}
+
+	res = &dtos.UserProfileResponse{
+		Name:     user.Name,
+		Username: user.Username,
+	}
+
+	return res, nil
+}
+
 // UserDeleteProfile godoc
 // @Summary      Delete Profile
 // @Description  User delete an Profile
